@@ -3,13 +3,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
 <style>
-/* Layout: モバイル1カラム + 下部タブ。カード型ランキング。リーグ色をセマンティックに。 */
+/* Layout: モバイル1カラム + 下部タブ。GO風タイプグリッド。リーグ色をセマンティックに。 */
 :root{
   --bg:#f4f6fb; --surface:#ffffff; --surface-2:#eef1f8; --line:#dfe4ef;
   --fg:#1b2130; --muted:#5d6782; --faint:#8a93ab;
   --accent:#2f8f83; --accent-fg:#ffffff;
   --sl:#2b6cb0; --ul:#b7791f; --ml:#7c4dcc;
-  --shadow:#6b4a9e; --shiny:#d98a00; --lucky:#d98a00; --danger:#c0485a;
+  --shadow:#6b4a9e; --shiny:#d98a00; --lucky:#d98a00; --danger:#c0485a; --good:#2f9e6f;
   --shadow-soft:0 1px 2px rgba(20,28,48,.06),0 6px 18px rgba(20,28,48,.07);
   --radius:16px;
   --f-main:"M PLUS Rounded 1c",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
@@ -20,7 +20,7 @@
   --fg:#e8ecf6; --muted:#9aa5c2; --faint:#6b7493;
   --accent:#4fc0b0; --accent-fg:#06211d;
   --sl:#6aa6e0; --ul:#e0b54e; --ml:#b793f0;
-  --shadow:#b79be8; --shiny:#f0b64a; --lucky:#f0b64a; --danger:#e8788a;
+  --shadow:#b79be8; --shiny:#f0b64a; --lucky:#f0b64a; --danger:#e8788a; --good:#57c796;
   --shadow-soft:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
   color-scheme:dark;
 }}
@@ -29,145 +29,149 @@
   --fg:#e8ecf6; --muted:#9aa5c2; --faint:#6b7493;
   --accent:#4fc0b0; --accent-fg:#06211d;
   --sl:#6aa6e0; --ul:#e0b54e; --ml:#b793f0;
-  --shadow:#b79be8; --shiny:#f0b64a; --lucky:#f0b64a; --danger:#e8788a;
+  --shadow:#b79be8; --shiny:#f0b64a; --lucky:#f0b64a; --danger:#e8788a; --good:#57c796;
   --shadow-soft:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+html{font-size:20px}
 html,body{height:100%}
-html{font-size:18px}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-main);font-size:1rem;line-height:1.55;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
 h1,h2,h3{margin:0;text-wrap:balance;font-weight:800}
 button{font-family:inherit;cursor:pointer}
-input,select,textarea{font-family:inherit;font-size:16px}
+input,select,textarea{font-family:inherit;font-size:1rem}
 .num{font-variant-numeric:tabular-nums}
 
-/* app shell */
 #app{min-height:100%;display:flex;flex-direction:column}
 header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
 .bar-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;display:flex;align-items:center;gap:10px}
-.brand{font-weight:800;font-size:1.05rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.brand .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--sl),var(--ml));box-shadow:inset 0 0 0 2px var(--surface)}
-main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:16px;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:720px;width:100%;margin:0 auto}
+.brand{font-weight:800;font-size:1.1rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.brand .dot{width:13px;height:13px;border-radius:50%;background:linear-gradient(135deg,var(--sl),var(--ml));box-shadow:inset 0 0 0 2px var(--surface)}
+main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:16px;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));max-width:760px;width:100%;margin:0 auto}
 
-/* search */
-.search{display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:10px 16px;box-shadow:var(--shadow-soft)}
-.search input{border:0;background:transparent;color:var(--fg);width:100%;outline:none}
+.search{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:12px 18px;box-shadow:var(--shadow-soft)}
+.search input{border:0;background:transparent;color:var(--fg);width:100%;outline:none;font-size:1.05rem}
 .search svg{flex:none;color:var(--faint)}
-.hint{color:var(--muted);font-size:.86rem;margin:14px 2px}
+.sec-label{font-size:.82rem;font-weight:800;color:var(--faint);letter-spacing:.08em;margin:18px 2px 8px}
 
-/* species list */
-.list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-.sp-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;width:100%;color:inherit;box-shadow:var(--shadow-soft)}
+/* GO風タイプグリッド */
+.typegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tcell{display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:0;padding:4px 0}
+.tcirc{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;box-shadow:var(--shadow-soft);border:3px solid transparent;transition:transform .08s}
+.tcell[aria-pressed="true"] .tcirc{border-color:var(--fg);transform:scale(1.06)}
+.tcell:active .tcirc{transform:scale(.96)}
+.tname{font-size:.8rem;font-weight:700;color:var(--fg)}
+.tnum{font-size:.74rem;font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
+
+.chiprow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rchip{border:1.5px solid var(--rc,var(--line));background:transparent;color:var(--fg);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.92rem}
+.rchip[aria-pressed="true"]{background:var(--rc,var(--accent));color:#fff;border-color:transparent}
+.rchip.clear{border-color:var(--line);color:var(--muted)}
+.regchip{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 15px;font-weight:700;font-size:.92rem}
+.regchip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:transparent}
+
+.list{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+.sp-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;width:100%;color:inherit;box-shadow:var(--shadow-soft)}
 .sp-row:active{transform:scale(.99)}
-.dex{font-family:var(--f-num);color:var(--faint);font-size:.8rem;min-width:46px}
-.sp-name{font-weight:700;flex:1;min-width:0}
-.sp-own{font-size:.72rem;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);padding:3px 9px;border-radius:999px}
-.chev{color:var(--faint)}
+.dex{font-family:var(--f-num);color:var(--faint);font-size:.85rem;min-width:52px}
+.sp-name{font-weight:700;flex:1;min-width:0;font-size:1.05rem}
+.sp-mini{display:flex;gap:4px}
+.mini-t{width:14px;height:14px;border-radius:50%}
+.sp-own{font-size:.76rem;font-weight:800;color:var(--good);background:color-mix(in srgb,var(--good) 16%,transparent);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.chev{color:var(--faint);font-size:1.2rem}
 
-/* detail */
+.back{background:var(--surface-2);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:9px 16px;font-weight:700;font-size:.92rem;display:inline-flex;gap:6px;align-items:center;margin-bottom:12px}
 .detail-head{display:flex;align-items:baseline;gap:10px;margin:4px 2px 2px}
-.detail-head .d-dex{font-family:var(--f-num);color:var(--faint);font-size:.85rem}
-.detail-head h2{font-size:1.4rem}
-.back{background:var(--surface-2);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.85rem;display:inline-flex;gap:6px;align-items:center;margin-bottom:12px}
+.detail-head .d-dex{font-family:var(--f-num);color:var(--faint);font-size:.9rem}
+.detail-head h2{font-size:1.5rem}
+.detail-types{display:flex;gap:6px;margin:4px 2px 0}
+.tbadge{font-size:.82rem;font-weight:700;color:#fff;padding:3px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.85rem}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:9px 15px;font-weight:700;font-size:.9rem}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:transparent}
-.lg-tabs{display:flex;gap:8px;margin:10px 0 4px}
-.lg-tab{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 6px;font-weight:800;font-size:.9rem;color:var(--muted);position:relative}
-.lg-tab .lg-cap{display:block;font-size:.68rem;font-weight:700;color:var(--faint);margin-top:2px}
+.lg-tabs{display:flex;gap:8px;margin:12px 0 4px}
+.lg-tab{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 6px;font-weight:800;font-size:.95rem;color:var(--muted)}
+.lg-tab .lg-cap{display:block;font-size:.7rem;font-weight:700;color:var(--faint);margin-top:2px}
 .lg-tab[aria-pressed="true"][data-lg="1"]{color:#fff;background:var(--sl);border-color:transparent}
 .lg-tab[aria-pressed="true"][data-lg="2"]{color:#3a2d06;background:var(--ul);border-color:transparent}
 .lg-tab[aria-pressed="true"][data-lg="3"]{color:#fff;background:var(--ml);border-color:transparent}
 .lg-tab[aria-pressed="true"] .lg-cap{color:inherit;opacity:.85}
 
-/* ranking rows */
-.ranks{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.rk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;gap:10px}
-.rk.owned{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.ranks{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+.rk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;gap:10px}
+.rk.owned{border-color:color-mix(in srgb,var(--good) 55%,var(--line))}
 .rk-top{display:flex;align-items:center;gap:12px}
-.rk-no{width:30px;height:30px;flex:none;border-radius:9px;background:var(--surface-2);color:var(--muted);font-weight:800;display:grid;place-items:center;font-size:.9rem}
-.rk.owned .rk-no{background:var(--accent);color:var(--accent-fg)}
-.iv{font-family:var(--f-num);font-weight:700;font-size:1.05rem;letter-spacing:.01em}
-.rk-meta{margin-left:auto;text-align:right;color:var(--muted);font-size:.78rem;font-family:var(--f-num)}
-.rk-meta b{color:var(--fg);font-size:.92rem}
-.addbtn{flex:none;border:1px dashed var(--line);background:transparent;color:var(--accent);border-radius:10px;padding:7px 10px;font-weight:800;font-size:.8rem}
+.rk-no{width:32px;height:32px;flex:none;border-radius:9px;background:var(--surface-2);color:var(--muted);font-weight:800;display:grid;place-items:center;font-size:.95rem}
+.rk.owned .rk-no{background:var(--good);color:#fff}
+.iv{font-family:var(--f-num);font-weight:700;font-size:1.15rem;letter-spacing:.01em}
+.rk-meta{margin-left:auto;text-align:right;color:var(--muted);font-size:.82rem;font-family:var(--f-num)}
+.rk-meta b{color:var(--fg);font-size:.98rem}
+.addbtn{flex:none;border:1px dashed var(--line);background:transparent;color:var(--accent);border-radius:10px;padding:8px 11px;font-weight:800;font-size:.85rem}
 .haves{display:flex;flex-wrap:wrap;gap:6px}
-.have{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 10px;font-size:.76rem;font-weight:700}
-.tag{font-size:.66rem;font-weight:800;padding:2px 6px;border-radius:999px;line-height:1}
+.have{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:5px 7px 5px 11px;font-size:.8rem;font-weight:700}
+.tag{font-size:.7rem;font-weight:800;padding:2px 7px;border-radius:999px;line-height:1}
 .t-sh{color:#fff;background:var(--shadow)} .t-pu{color:#fff;background:#3f8f6a}
 .t-xl{color:#fff;background:#c0485a} .t-xs{color:#fff;background:#4a74c0}
 .t-shiny{color:#3a2d06;background:var(--shiny)} .t-lucky{color:#3a2d06;background:var(--lucky)}
-.have .del{border:0;background:transparent;color:var(--faint);font-weight:800;font-size:1rem;line-height:1;padding:0 2px}
+.have .del{border:0;background:transparent;color:var(--faint);font-weight:800;font-size:1.05rem;line-height:1;padding:0 2px}
 
-/* collection */
+/* collection stats */
+.stats{display:flex;flex-direction:column;gap:9px;margin:4px 0 6px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-soft)}
+.stat-top{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.stat-top b{font-size:1rem} .stat-top .frac{margin-left:auto;font-family:var(--f-num);font-weight:800;color:var(--muted)}
+.stat-top .comp{margin-left:auto;font-weight:800;color:var(--good);font-size:.9rem}
+.bar{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--ml));border-radius:999px}
+.stat.done{border-color:color-mix(in srgb,var(--good) 55%,var(--line))}
+
 .coll-group{margin-top:16px}
-.coll-group h3{font-size:1rem;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
-.coll-group h3 .g-dex{font-family:var(--f-num);color:var(--faint);font-size:.8rem;font-weight:700}
+.coll-group h3{font-size:1.05rem;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.coll-group h3 .g-dex{font-family:var(--f-num);color:var(--faint);font-size:.82rem;font-weight:700}
 
-/* account */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;gap:12px}
-.card h2{font-size:1.1rem}
+.card h2{font-size:1.15rem}
 .field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
-.field input{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:10px;padding:11px 13px;outline:none}
+.field label{font-size:.82rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.field input{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:10px;padding:12px 14px;outline:none}
 .field input:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
-.btn{border:0;border-radius:11px;padding:12px 16px;font-weight:800;background:var(--accent);color:var(--accent-fg)}
+.btn{border:0;border-radius:11px;padding:13px 16px;font-weight:800;background:var(--accent);color:var(--accent-fg)}
 .btn.ghost{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
 .btn:disabled{opacity:.55}
-.msg{font-size:.82rem;color:var(--muted)} .msg.err{color:var(--danger)} .msg.ok{color:var(--accent)}
+.msg{font-size:.88rem;color:var(--muted)} .msg.err{color:var(--danger)} .msg.ok{color:var(--good)}
 
-/* bottom nav */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs button{flex:1;border:0;background:transparent;color:var(--faint);padding:9px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.68rem;font-weight:700}
+nav.tabs button{flex:1;border:0;background:transparent;color:var(--faint);padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.72rem;font-weight:700}
 nav.tabs button[aria-selected="true"]{color:var(--accent)}
-nav.tabs svg{width:23px;height:23px}
+nav.tabs svg{width:24px;height:24px}
 
-/* modal */
 .scrim{position:fixed;inset:0;z-index:50;background:rgba(10,14,24,.5);display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;max-height:88vh;overflow:auto}
-.sheet h3{font-size:1.05rem}
+.sheet h3{font-size:1.1rem}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button{flex:1;min-width:72px;border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:10px;padding:10px 6px;font-weight:700;font-size:.85rem}
+.seg button{flex:1;min-width:76px;border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:10px;padding:11px 6px;font-weight:700;font-size:.9rem}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:transparent}
 .toggles{display:flex;gap:8px;flex-wrap:wrap}
-.tgl{flex:1;min-width:120px;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;font-weight:700;font-size:.9rem}
-.tgl input{width:20px;height:20px;accent-color:var(--accent)}
+.tgl{flex:1;min-width:130px;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 13px;font-weight:700;font-size:.95rem}
+.tgl input{width:22px;height:22px;accent-color:var(--accent)}
 .sheet .row2{display:flex;gap:10px}
-.loading{color:var(--muted);text-align:center;padding:30px}
+.loading{color:var(--muted);text-align:center;padding:34px}
 .empty{color:var(--muted);text-align:center;padding:40px 20px;border:1px dashed var(--line);border-radius:var(--radius);margin-top:16px}
-.empty b{color:var(--fg);display:block;margin-bottom:6px;font-size:1rem}
-.note{font-size:.78rem;color:var(--faint);margin-top:8px}
-.filters{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.typerow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.tchip{flex:none;border:1.5px solid var(--tc);background:transparent;color:var(--fg);border-radius:999px;padding:7px 13px;font-weight:700;font-size:.9rem;white-space:nowrap}
-.tchip[aria-pressed="true"]{background:var(--tc);color:#fff;border-color:transparent}
-.rrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.rchip{border:1.5px solid var(--rc,var(--line));background:transparent;color:var(--fg);border-radius:999px;padding:7px 15px;font-weight:700;font-size:.9rem}
-.rchip[aria-pressed="true"]{background:var(--rc);color:#fff;border-color:transparent}
-.rchip.clear{border-color:var(--line);color:var(--muted);margin-left:auto}
-.detail-types{display:flex;gap:6px;margin:4px 2px 0}
-.tbadge{font-size:.8rem;font-weight:700;color:#fff;padding:3px 11px;border-radius:999px}
+.empty b{color:var(--fg);display:block;margin-bottom:6px;font-size:1.05rem}
+.note{font-size:.84rem;color:var(--faint);margin-top:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <div id="app">
-  <header class="bar">
-    <div class="bar-in">
-      <div class="brand"><span class="dot"></span>理想個体ノート</div>
-    </div>
-  </header>
+  <header class="bar"><div class="bar-in"><div class="brand"><span class="dot"></span>理想個体ノート</div></div></header>
   <main id="main"></main>
   <nav class="tabs" id="tabs">
-    <button data-tab="search" aria-selected="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>検索</button>
-    <button data-tab="collection" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>手持ち</button>
-    <button data-tab="account" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>アカウント</button>
+    <button data-tab="search" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>検索</button>
+    <button data-tab="collection" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>手持ち</button>
+    <button data-tab="account" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>アカウント</button>
   </nav>
 </div>
 
@@ -177,97 +181,105 @@ const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 
 const LEAGUES={1:{name:"スーパー",cap:"CP1500"},2:{name:"ハイパー",cap:"CP2500"},3:{name:"マスター",cap:"制限なし"}};
+const TYPES=[["normal","ノーマル","#9298a3","⚪"],["fire","ほのお","#f05a3f","🔥"],["water","みず","#3692dc","💧"],["grass","くさ","#4aa84a","🍃"],["electric","でんき","#e0bb2e","⚡"],["ice","こおり","#5cc6d0","❄️"],["fighting","かくとう","#d8433f","🥊"],["poison","どく","#9a5bc2","☠️"],["ground","じめん","#cf9b50","⛰️"],["flying","ひこう","#8aa7e0","🕊️"],["psychic","エスパー","#ef6aa0","🔮"],["bug","むし","#9bb52b","🐛"],["rock","いわ","#b6a95f","🪨"],["ghost","ゴースト","#6b5a99","👻"],["dragon","ドラゴン","#5a66d8","🐉"],["dark","あく","#6d5a56","🌙"],["steel","はがね","#6aa5bc","⚙️"],["fairy","フェアリー","#e48ad8","✨"]];
+const TYPEMAP=Object.fromEntries(TYPES.map(t=>[t[0],t]));
+const RARITY=[["legendary","伝説","#b07b2e"],["mythical","幻","#b5497f"],["ultra_beast","UB","#3f9f8f"]];
+const REGIONS=[["カントー",1,151],["ジョウト",152,251],["ホウエン",252,386],["シンオウ",387,493],["イッシュ",494,649],["カロス",650,721],["アローラ",722,809],["ガラル",810,898],["ヒスイ",899,905],["パルデア",906,1025]];
+
 const main=document.getElementById("main");
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let session=null, activeTab="search";
+let speciesAll=[], formsByDex={}, formCache={}, speciesName={}, typeCount={}, ownedDex=new Set();
 
-/* ---------- caches ---------- */
-const formCache={}; // id -> {dex,region,form,species_en}
-const speciesName={}; // dex -> name
-
-/* ---------- tab nav ---------- */
 const tabs=document.getElementById("tabs");
-tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;switchTab(b.dataset.tab);});
-function switchTab(t){
-  activeTab=t;
-  [...tabs.children].forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
-  if(t==="search")renderSearch();
-  else if(t==="collection")renderCollection();
-  else renderAccount();
+tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(b)switchTab(b.dataset.tab);});
+function switchTab(t){activeTab=t;[...tabs.children].forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  if(t==="search")renderSearch();else if(t==="collection")renderCollection();else renderAccount();}
+
+/* ---------- boot: load reference data once ---------- */
+async function boot(){
+  main.innerHTML=`<div class="loading">データを読み込み中…</div>`;
+  const [sp,fm,ss]=await Promise.all([
+    sb.from("pokemon_species").select("dex,name_ja").order("dex").limit(2000),
+    sb.from("pokemon_forms").select("id,dex,region,form,species_en,type1,type2,rarity").order("id").limit(2000),
+    sb.auth.getSession()
+  ]);
+  if(sp.error||fm.error){main.innerHTML=`<div class="empty"><b>読み込みエラー</b>${esc((sp.error||fm.error).message)}</div>`;return;}
+  speciesAll=sp.data; speciesAll.forEach(s=>speciesName[s.dex]=s.name_ja);
+  fm.data.forEach(f=>{formCache[f.id]=f;(formsByDex[f.dex]=formsByDex[f.dex]||[]).push(f);});
+  TYPES.forEach(t=>typeCount[t[0]]=0);
+  speciesAll.forEach(s=>{const set=new Set();(formsByDex[s.dex]||[]).forEach(f=>{if(f.type1)set.add(f.type1);if(f.type2)set.add(f.type2);});set.forEach(t=>{if(typeCount[t]!=null)typeCount[t]++;});});
+  session=ss.data.session;
+  if(session)await loadOwnedDex();
+  switchTab("search");
+}
+async function loadOwnedDex(){
+  ownedDex=new Set();
+  if(!session)return;
+  const {data}=await sb.from("user_collection").select("form_id");
+  (data||[]).forEach(r=>{const f=formCache[r.form_id];if(f)ownedDex.add(f.dex);});
 }
 
 /* ---------- SEARCH ---------- */
-const TYPES=[["normal","ノーマル","#9aa0a6"],["fire","ほのお","#f05a3f"],["water","みず","#3692dc"],["grass","くさ","#4aa84a"],["electric","でんき","#e0bb2e"],["ice","こおり","#5cc6d0"],["fighting","かくとう","#d8433f"],["poison","どく","#9a5bc2"],["ground","じめん","#cf9b50"],["flying","ひこう","#8aa7e0"],["psychic","エスパー","#ef6aa0"],["bug","むし","#9bb52b"],["rock","いわ","#b6a95f"],["ghost","ゴースト","#6b5a99"],["dragon","ドラゴン","#5a66d8"],["dark","あく","#6d5a56"],["steel","はがね","#6aa5bc"],["fairy","フェアリー","#e48ad8"]];
-const TYPEMAP=Object.fromEntries(TYPES.map(t=>[t[0],t]));
-const RARITY=[["legendary","伝説","#b07b2e"],["mythical","幻","#b5497f"],["ultra_beast","UB","#3f9f8f"]];
-let searchState={q:"",type:null,rarity:null};
+let searchState={q:"",type:null,rarity:null,region:null};
 function renderSearch(){
   main.innerHTML=`
     <label class="search">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
       <input id="q" inputmode="search" placeholder="名前か図鑑番号で検索" value="${esc(searchState.q)}" autocomplete="off">
     </label>
-    <div class="filters">
-      <div class="typerow" id="typerow">${TYPES.map(t=>`<button class="tchip" data-t="${t[0]}" aria-pressed="${searchState.type===t[0]}" style="--tc:${t[2]}">${t[1]}</button>`).join("")}</div>
-      <div class="rrow" id="rrow">${RARITY.map(r=>`<button class="rchip" data-r="${r[0]}" aria-pressed="${searchState.rarity===r[0]}" style="--rc:${r[2]}">${r[1]}</button>`).join("")}<button class="rchip clear" id="clearf">クリア</button></div>
-    </div>
+    <div class="sec-label">タイプ</div>
+    <div class="typegrid" id="typegrid">${TYPES.map(t=>`
+      <button class="tcell" data-t="${t[0]}" aria-pressed="${searchState.type===t[0]}">
+        <span class="tcirc" style="background:${t[2]}">${t[3]}</span>
+        <span class="tname">${t[1]}</span><span class="tnum">${typeCount[t[0]]||0}</span>
+      </button>`).join("")}</div>
+    <div class="sec-label">地方</div>
+    <div class="chiprow" id="regrow">${REGIONS.map((r,i)=>`<button class="regchip" data-i="${i}" aria-pressed="${searchState.region===i}">${r[0]}</button>`).join("")}</div>
+    <div class="sec-label">レア度</div>
+    <div class="chiprow" id="rrow">${RARITY.map(r=>`<button class="rchip" data-r="${r[0]}" aria-pressed="${searchState.rarity===r[0]}" style="--rc:${r[2]}">${r[1]}</button>`).join("")}<button class="rchip clear" id="clearf">すべて解除</button></div>
     <div class="list" id="splist"></div>`;
-  const inp=document.getElementById("q");
-  inp.addEventListener("input",()=>{searchState.q=inp.value;debouncedSearch();});
-  document.getElementById("typerow").addEventListener("click",e=>{const b=e.target.closest(".tchip");if(!b)return;searchState.type=searchState.type===b.dataset.t?null:b.dataset.t;renderSearch();});
-  document.getElementById("rrow").addEventListener("click",e=>{if(e.target.closest("#clearf")){searchState.type=null;searchState.rarity=null;renderSearch();return;}const b=e.target.closest(".rchip");if(!b)return;searchState.rarity=searchState.rarity===b.dataset.r?null:b.dataset.r;renderSearch();});
-  runSearch();
+  document.getElementById("q").addEventListener("input",e=>{searchState.q=e.target.value;paintResults();});
+  document.getElementById("typegrid").addEventListener("click",e=>{const b=e.target.closest(".tcell");if(!b)return;searchState.type=searchState.type===b.dataset.t?null:b.dataset.t;renderSearch();});
+  document.getElementById("regrow").addEventListener("click",e=>{const b=e.target.closest(".regchip");if(!b)return;const i=+b.dataset.i;searchState.region=searchState.region===i?null:i;renderSearch();});
+  document.getElementById("rrow").addEventListener("click",e=>{if(e.target.closest("#clearf")){searchState={q:searchState.q,type:null,rarity:null,region:null};renderSearch();return;}const b=e.target.closest(".rchip");if(!b)return;searchState.rarity=searchState.rarity===b.dataset.r?null:b.dataset.r;renderSearch();});
+  paintResults();
 }
-let tmr=null;
-function debouncedSearch(){clearTimeout(tmr);tmr=setTimeout(runSearch,220);}
-async function runSearch(){
-  const list=document.getElementById("splist"); if(list)list.innerHTML=`<div class="loading">検索中…</div>`;
-  const v=searchState.q.trim();
-  let dexFilter=null;
-  if(searchState.type||searchState.rarity){
-    let fq=sb.from("pokemon_forms").select("dex");
-    if(searchState.type)fq=fq.or(`type1.eq.${searchState.type},type2.eq.${searchState.type}`);
-    if(searchState.rarity)fq=fq.eq("rarity",searchState.rarity);
-    const {data:fd,error:fe}=await fq.limit(5000);
-    if(fe){if(list)list.innerHTML=`<div class="empty">読み込みエラー：${esc(fe.message)}</div>`;return;}
-    dexFilter=[...new Set(fd.map(x=>x.dex))];
-    if(!dexFilter.length){paintSpecies([]);return;}
-  }
-  let qy=sb.from("pokemon_species").select("dex,name_ja");
-  if(/^\d+$/.test(v))qy=qy.eq("dex",parseInt(v));
-  else if(v)qy=qy.ilike("name_ja","%"+v+"%");
-  if(dexFilter)qy=qy.in("dex",dexFilter);
-  qy=qy.order("dex").limit(dexFilter?400:60);
-  const {data,error}=await qy;
-  if(error){if(list)list.innerHTML=`<div class="empty">読み込みエラー：${esc(error.message)}</div>`;return;}
-  data.forEach(s=>speciesName[s.dex]=s.name_ja);
-  paintSpecies(data);
+function filteredSpecies(){
+  let arr=speciesAll; const v=searchState.q.trim();
+  if(/^\d+$/.test(v))arr=arr.filter(s=>s.dex===+v);
+  else if(v)arr=arr.filter(s=>(s.name_ja||"").includes(v));
+  if(searchState.region!=null){const[,lo,hi]=REGIONS[searchState.region];arr=arr.filter(s=>s.dex>=lo&&s.dex<=hi);}
+  if(searchState.type||searchState.rarity)arr=arr.filter(s=>(formsByDex[s.dex]||[]).some(f=>(!searchState.type||f.type1===searchState.type||f.type2===searchState.type)&&(!searchState.rarity||f.rarity===searchState.rarity)));
+  return arr;
 }
-function paintSpecies(data){
+function paintResults(){
   const list=document.getElementById("splist"); if(!list)return;
-  if(!data.length){list.innerHTML=`<div class="empty"><b>見つかりません</b>別の名前や図鑑番号で試してください。</div>`;return;}
-  list.innerHTML=data.map(s=>`
-    <button class="sp-row" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
+  const data=filteredSpecies();
+  if(!data.length){list.innerHTML=`<div class="empty"><b>該当なし</b>条件を変えてみてください。</div>`;return;}
+  const cap=data.slice(0,300);
+  list.innerHTML=cap.map(s=>{
+    const fs=formsByDex[s.dex]||[]; const tset=[]; fs.forEach(f=>{[f.type1,f.type2].forEach(t=>{if(t&&!tset.includes(t))tset.push(t);});});
+    const mini=tset.slice(0,3).map(t=>`<span class="mini-t" style="background:${(TYPEMAP[t]||[])[2]||'#999'}"></span>`).join("");
+    return `<button class="sp-row" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
       <span class="dex num">No.${s.dex}</span>
       <span class="sp-name">${esc(s.name_ja)}</span>
-      <span class="chev">›</span>
-    </button>`).join("");
+      <span class="sp-mini">${mini}</span>
+      ${ownedDex.has(s.dex)?`<span class="sp-own">所持</span>`:""}
+      <span class="chev">›</span></button>`;
+  }).join("")+(data.length>300?`<div class="note" style="text-align:center">他 ${data.length-300} 件。検索で絞り込んでください。</div>`:"");
   list.querySelectorAll(".sp-row").forEach(b=>b.addEventListener("click",()=>openSpecies(+b.dataset.dex,b.dataset.name)));
 }
 
-/* ---------- DETAIL (ranking) ---------- */
+/* ---------- DETAIL ---------- */
 let detail={dex:null,name:"",forms:[],formId:null,league:1};
-async function openSpecies(dex,name){
-  detail={dex,name,forms:[],formId:null,league:1};
-  main.innerHTML=`<div class="loading">読み込み中…</div>`;
-  const {data,error}=await sb.from("pokemon_forms").select("id,region,form,species_en,type1,type2").eq("dex",dex).order("id");
-  if(error){main.innerHTML=`<div class="empty">読み込みエラー：${esc(error.message)}</div>`;return;}
-  data.forEach(f=>formCache[f.id]=Object.assign({dex},f));
-  detail.forms=data; detail.formId=data[0]?.id??null;
+function openSpecies(dex,name){
+  const fs=(formsByDex[dex]||[]).slice();
+  detail={dex,name,forms:fs,formId:fs[0]?.id??null,league:1};
   renderDetail();
 }
 function formLabel(f){return f.region||f.form||"通常";}
-function typeBadges(f){if(!f)return"";return [f.type1,f.type2].filter(Boolean).map(t=>{const m=TYPEMAP[t];return m?`<span class="tbadge" style="background:${m[2]}">${m[1]}</span>`:"";}).join("");}
+function typeBadges(f){if(!f)return"";return [f.type1,f.type2].filter(Boolean).map(t=>{const m=TYPEMAP[t];return m?`<span class="tbadge" style="background:${m[2]}">${m[3]} ${m[1]}</span>`:"";}).join("");}
 function renderDetail(){
   const fs=detail.forms;
   main.innerHTML=`
@@ -275,182 +287,126 @@ function renderDetail(){
     <div class="detail-head"><span class="d-dex num">No.${detail.dex}</span><h2>${esc(detail.name)}</h2></div>
     <div class="detail-types">${typeBadges(fs.find(f=>f.id===detail.formId))}</div>
     ${fs.length>1?`<div class="chips" id="formchips">${fs.map(f=>`<button class="chip" data-id="${f.id}" aria-pressed="${f.id===detail.formId}">${esc(formLabel(f))}</button>`).join("")}</div>`:""}
-    <div class="lg-tabs" id="lgtabs">
-      ${[1,2,3].map(l=>`<button class="lg-tab" data-lg="${l}" aria-pressed="${l===detail.league}">${LEAGUES[l].name}<span class="lg-cap">${LEAGUES[l].cap}</span></button>`).join("")}
-    </div>
+    <div class="lg-tabs" id="lgtabs">${[1,2,3].map(l=>`<button class="lg-tab" data-lg="${l}" aria-pressed="${l===detail.league}">${LEAGUES[l].name}<span class="lg-cap">${LEAGUES[l].cap}</span></button>`).join("")}</div>
     <div class="ranks" id="ranks"></div>`;
   document.getElementById("back").addEventListener("click",()=>switchTab("search"));
-  const fc=document.getElementById("formchips");
-  if(fc)fc.addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;detail.formId=+b.dataset.id;renderDetail();});
-  document.getElementById("lgtabs").addEventListener("click",e=>{const b=e.target.closest(".lg-tab");if(!b)return;detail.league=+b.dataset.lg;renderDetail();});
+  const fc=document.getElementById("formchips"); if(fc)fc.addEventListener("click",e=>{const b=e.target.closest(".chip");if(b){detail.formId=+b.dataset.id;renderDetail();}});
+  document.getElementById("lgtabs").addEventListener("click",e=>{const b=e.target.closest(".lg-tab");if(b){detail.league=+b.dataset.lg;renderDetail();}});
   loadRanking();
 }
 async function loadRanking(){
   const box=document.getElementById("ranks"); box.innerHTML=`<div class="loading">理想個体を取得中…</div>`;
-  const fid=detail.formId, lg=detail.league;
+  const fid=detail.formId,lg=detail.league;
   const [{data:ideal,error:e1},owned]=await Promise.all([
     sb.from("ideal_ivs").select("rank,atk_iv,def_iv,hp_iv,level,cp").eq("form_id",fid).eq("league_id",lg).order("rank"),
     loadOwned(fid,lg)
   ]);
   if(e1){box.innerHTML=`<div class="empty">読み込みエラー：${esc(e1.message)}</div>`;return;}
   const byRank={}; owned.forEach(o=>{(byRank[o.rank]=byRank[o.rank]||[]).push(o);});
-  box.innerHTML=ideal.map(r=>{
-    const haves=byRank[r.rank]||[];
-    return `<div class="rk${haves.length?" owned":""}">
-      <div class="rk-top">
-        <span class="rk-no num">${r.rank}</span>
-        <span class="iv num">${r.atk_iv}/${r.def_iv}/${r.hp_iv}</span>
-        <span class="rk-meta"><b>${r.cp}</b> CP<br>Lv${(+r.level).toFixed(1)}</span>
-        <button class="addbtn" data-rank="${r.rank}">＋登録</button>
-      </div>
-      ${haves.length?`<div class="haves">${haves.map(haveChip).join("")}</div>`:""}
-    </div>`;
+  box.innerHTML=ideal.map(r=>{const haves=byRank[r.rank]||[];
+    return `<div class="rk${haves.length?" owned":""}"><div class="rk-top">
+      <span class="rk-no num">${r.rank}</span>
+      <span class="iv num">${r.atk_iv}/${r.def_iv}/${r.hp_iv}</span>
+      <span class="rk-meta"><b>${r.cp}</b> CP<br>Lv${(+r.level).toFixed(1)}</span>
+      <button class="addbtn" data-rank="${r.rank}">＋登録</button>
+    </div>${haves.length?`<div class="haves">${haves.map(haveChip).join("")}</div>`:""}</div>`;
   }).join("");
   box.querySelectorAll(".addbtn").forEach(b=>b.addEventListener("click",()=>openRegister(+b.dataset.rank)));
   box.querySelectorAll(".have .del").forEach(b=>b.addEventListener("click",()=>deleteHave(+b.dataset.id)));
 }
-async function loadOwned(fid,lg){
-  if(!session)return [];
-  const {data,error}=await sb.from("user_collection").select("id,rank,is_shadow,is_purified,is_shiny,is_lucky,size").eq("form_id",fid).eq("league_id",lg);
-  return error?[]:data;
-}
-function haveChip(o){
-  const tags=[];
-  if(o.is_shadow)tags.push(`<span class="tag t-sh">S</span>`);
-  if(o.is_purified)tags.push(`<span class="tag t-pu">浄</span>`);
-  if(o.size==="XXL")tags.push(`<span class="tag t-xl">XXL</span>`);
-  if(o.size==="XXS")tags.push(`<span class="tag t-xs">XXS</span>`);
-  if(o.is_shiny)tags.push(`<span class="tag t-shiny">色</span>`);
-  if(o.is_lucky)tags.push(`<span class="tag t-lucky">キラ</span>`);
-  return `<span class="have">所持${tags.join("")}<button class="del" data-id="${o.id}" title="削除">×</button></span>`;
-}
+async function loadOwned(fid,lg){if(!session)return[];const {data,error}=await sb.from("user_collection").select("id,rank,is_shadow,is_purified,is_shiny,is_lucky,size").eq("form_id",fid).eq("league_id",lg);return error?[]:data;}
+function haveChip(o){const tags=[];
+  if(o.is_shadow)tags.push(`<span class="tag t-sh">S</span>`); if(o.is_purified)tags.push(`<span class="tag t-pu">浄</span>`);
+  if(o.size==="XXL")tags.push(`<span class="tag t-xl">XXL</span>`); if(o.size==="XXS")tags.push(`<span class="tag t-xs">XXS</span>`);
+  if(o.is_shiny)tags.push(`<span class="tag t-shiny">色</span>`); if(o.is_lucky)tags.push(`<span class="tag t-lucky">キラ</span>`);
+  return `<span class="have">所持${tags.join("")}<button class="del" data-id="${o.id}" title="削除">×</button></span>`;}
 
-/* ---------- REGISTER sheet ---------- */
+/* ---------- REGISTER ---------- */
 function openRegister(rank){
   if(!session){toast("登録にはログインが必要です");switchTab("account");return;}
   const f=formCache[detail.formId];
-  const state={status:"normal",size:"通常",shiny:false,lucky:false};
   const scrim=document.createElement("div");scrim.className="scrim";
   scrim.innerHTML=`<div class="sheet" role="dialog" aria-modal="true">
     <h3>${esc(detail.name)}${f&&formLabel(f)!=="通常"?"（"+esc(formLabel(f))+"）":""}・${LEAGUES[detail.league].name} 第${rank}位を登録</h3>
-    <div class="field"><label>状態</label><div class="seg" id="st">
-      <button data-v="normal" aria-pressed="true">通常</button>
-      <button data-v="shadow" aria-pressed="false">シャドウ</button>
-      <button data-v="purified" aria-pressed="false">リトレーン</button></div></div>
-    <div class="field"><label>サイズ</label><div class="seg" id="sz">
-      <button data-v="通常" aria-pressed="true">通常</button>
-      <button data-v="XXL" aria-pressed="false">XXL</button>
-      <button data-v="XXS" aria-pressed="false">XXS</button></div></div>
-    <div class="toggles">
-      <label class="tgl">色違い<input type="checkbox" id="shiny"></label>
-      <label class="tgl">キラ<input type="checkbox" id="lucky"></label>
-    </div>
+    <div class="field"><label>状態</label><div class="seg" id="st"><button data-v="normal" aria-pressed="true">通常</button><button data-v="shadow" aria-pressed="false">シャドウ</button><button data-v="purified" aria-pressed="false">リトレーン</button></div></div>
+    <div class="field"><label>サイズ</label><div class="seg" id="sz"><button data-v="通常" aria-pressed="true">通常</button><button data-v="XXL" aria-pressed="false">XXL</button><button data-v="XXS" aria-pressed="false">XXS</button></div></div>
+    <div class="toggles"><label class="tgl">色違い<input type="checkbox" id="shiny"></label><label class="tgl">キラ<input type="checkbox" id="lucky"></label></div>
     <div class="field"><label>メモ（任意）</label><input id="memo" placeholder="例：交換用 / 2体目"></div>
     <div class="msg" id="rmsg"></div>
-    <div class="row2"><button class="btn ghost" id="cancel" style="flex:1">やめる</button><button class="btn" id="save" style="flex:2">登録する</button></div>
-  </div>`;
+    <div class="row2"><button class="btn ghost" id="cancel" style="flex:1">やめる</button><button class="btn" id="save" style="flex:2">登録する</button></div></div>`;
   document.body.appendChild(scrim);
   scrim.addEventListener("click",e=>{if(e.target===scrim)scrim.remove();});
-  scrim.querySelector("#st").addEventListener("click",e=>seg(e,v=>state.status=v));
-  scrim.querySelector("#sz").addEventListener("click",e=>seg(e,v=>state.size=v));
+  scrim.querySelector("#st").addEventListener("click",e=>seg(e));
+  scrim.querySelector("#sz").addEventListener("click",e=>seg(e));
   scrim.querySelector("#cancel").addEventListener("click",()=>scrim.remove());
   scrim.querySelector("#save").addEventListener("click",async()=>{
     const btn=scrim.querySelector("#save");btn.disabled=true;
-    const row={form_id:detail.formId,league_id:detail.league,rank,
-      is_shadow:state.status==="shadow",is_purified:state.status==="purified",
+    const status=scrim.querySelector("#st").querySelector('[aria-pressed="true"]').dataset.v;
+    const row={form_id:detail.formId,league_id:detail.league,rank,is_shadow:status==="shadow",is_purified:status==="purified",
       is_shiny:scrim.querySelector("#shiny").checked,is_lucky:scrim.querySelector("#lucky").checked,
-      size:scrim.querySelector("#sz").querySelector('[aria-pressed="true"]').dataset.v,
-      memo:scrim.querySelector("#memo").value.trim()||null};
+      size:scrim.querySelector("#sz").querySelector('[aria-pressed="true"]').dataset.v,memo:scrim.querySelector("#memo").value.trim()||null};
     const {error}=await sb.from("user_collection").insert(row);
     if(error){scrim.querySelector("#rmsg").className="msg err";scrim.querySelector("#rmsg").textContent="登録できませんでした："+error.message;btn.disabled=false;return;}
-    scrim.remove();toast("登録しました");loadRanking();
+    ownedDex.add(detail.dex);scrim.remove();toast("登録しました");loadRanking();
   });
 }
-function seg(e,set){const b=e.target.closest("button");if(!b)return;[...b.parentElement.children].forEach(x=>x.setAttribute("aria-pressed",x===b));set(b.dataset.v);}
-async function deleteHave(id){
-  const {error}=await sb.from("user_collection").delete().eq("id",id);
-  if(!error){toast("削除しました");loadRanking();}
-}
+function seg(e){const b=e.target.closest("button");if(!b)return;[...b.parentElement.children].forEach(x=>x.setAttribute("aria-pressed",x===b));}
+async function deleteHave(id){const {error}=await sb.from("user_collection").delete().eq("id",id);if(!error){toast("削除しました");await loadOwnedDex();loadRanking();}}
 
 /* ---------- COLLECTION ---------- */
 async function renderCollection(){
-  if(!session){main.innerHTML=`<div class="empty"><b>ログインすると手持ちを記録できます</b>アカウントタブからログイン後、各ランクの「＋登録」で手持ちを追加できます。</div>`;return;}
+  if(!session){main.innerHTML=`<div class="empty"><b>ログインすると手持ちを記録できます</b>アカウントタブからログイン後、各ランクの「＋登録」で追加できます。</div>`;return;}
   main.innerHTML=`<div class="loading">手持ちを読み込み中…</div>`;
   const {data,error}=await sb.from("user_collection").select("id,form_id,league_id,rank,is_shadow,is_purified,is_shiny,is_lucky,size,memo").order("created_at",{ascending:false});
   if(error){main.innerHTML=`<div class="empty">読み込みエラー：${esc(error.message)}</div>`;return;}
-  if(!data.length){main.innerHTML=`<div class="empty"><b>まだ手持ちがありません</b>検索からポケモンを開き、該当ランクの「＋登録」で追加しましょう。</div>`;return;}
-  // resolve forms/species
-  const need=[...new Set(data.map(d=>d.form_id).filter(id=>!formCache[id]))];
-  if(need.length){const {data:fs}=await sb.from("pokemon_forms").select("id,dex,region,form,species_en").in("id",need);(fs||[]).forEach(f=>formCache[f.id]=f);}
-  const needDex=[...new Set(data.map(d=>formCache[d.form_id]?.dex).filter(dx=>dx&&!speciesName[dx]))];
-  if(needDex.length){const {data:sp}=await sb.from("pokemon_species").select("dex,name_ja").in("dex",needDex);(sp||[]).forEach(s=>speciesName[s.dex]=s.name_ja);}
-  // group by species(dex)
-  const groups={};
-  data.forEach(d=>{const f=formCache[d.form_id]||{};const dx=f.dex;(groups[dx]=groups[dx]||[]).push(d);});
-  main.innerHTML=`<div class="hint">${data.length}体を所持。× で削除できます。</div>`+
-    Object.keys(groups).sort((a,b)=>a-b).map(dx=>`
-      <div class="coll-group">
-        <h3>${esc(speciesName[dx]||"No."+dx)}<span class="g-dex num">No.${dx}</span></h3>
-        <div class="ranks">${groups[dx].map(collCard).join("")}</div>
-      </div>`).join("");
+  const owned=new Set(); data.forEach(d=>{const f=formCache[d.form_id];if(f)owned.add(f.dex);});
+  ownedDex=owned;
+  // region stats
+  const stats=REGIONS.map(([name,lo,hi])=>{const total=speciesAll.filter(s=>s.dex>=lo&&s.dex<=hi).length;const own=[...owned].filter(d=>d>=lo&&d<=hi).length;return {name,total,own};}).filter(r=>r.total>0);
+  let html=`<div class="sec-label">地方コンプ状況（このアプリ収録種のうち所持数）</div><div class="stats">`+
+    stats.map(r=>{const pct=r.total?Math.round(r.own/r.total*100):0;const done=r.own>=r.total&&r.total>0;
+      return `<div class="stat${done?" done":""}"><div class="stat-top"><b>${r.name}</b>${done?`<span class="comp">コンプ！🎉</span>`:`<span class="frac">${r.own} / ${r.total}</span>`}</div><div class="bar"><span style="width:${pct}%"></span></div></div>`;
+    }).join("")+`</div>`;
+  if(!data.length){html+=`<div class="empty"><b>まだ手持ちがありません</b>検索からポケモンを開き「＋登録」で追加しましょう。</div>`;main.innerHTML=html;return;}
+  const groups={}; data.forEach(d=>{const dx=(formCache[d.form_id]||{}).dex;(groups[dx]=groups[dx]||[]).push(d);});
+  html+=`<div class="sec-label">所持個体（${data.length}体）</div>`+Object.keys(groups).sort((a,b)=>a-b).map(dx=>`
+    <div class="coll-group"><h3>${esc(speciesName[dx]||"No."+dx)}<span class="g-dex num">No.${dx}</span></h3>
+      <div class="ranks">${groups[dx].map(collCard).join("")}</div></div>`).join("");
+  main.innerHTML=html;
   main.querySelectorAll(".have .del").forEach(b=>b.addEventListener("click",async()=>{await sb.from("user_collection").delete().eq("id",+b.dataset.id);renderCollection();}));
 }
-function collCard(o){
-  const f=formCache[o.form_id]||{};const fl=formLabel(f);
-  return `<div class="rk"><div class="rk-top">
-    <span class="rk-no num">${o.rank}</span>
-    <span class="iv" style="font-size:.9rem">${LEAGUES[o.league_id].name}${fl!=="通常"?"・"+esc(fl):""}</span>
-    <span class="rk-meta">${o.memo?esc(o.memo):""}</span>
-  </div><div class="haves">${haveChip(o)}</div></div>`;
-}
+function collCard(o){const f=formCache[o.form_id]||{};const fl=formLabel(f);
+  return `<div class="rk"><div class="rk-top"><span class="rk-no num">${o.rank}</span>
+    <span class="iv" style="font-size:.95rem">${LEAGUES[o.league_id].name}${fl!=="通常"?"・"+esc(fl):""}</span>
+    <span class="rk-meta">${o.memo?esc(o.memo):""}</span></div><div class="haves">${haveChip(o)}</div></div>`;}
 
 /* ---------- ACCOUNT ---------- */
 function renderAccount(){
   if(session){
-    main.innerHTML=`<div class="card">
-      <h2>ログイン中</h2>
-      <div class="msg ok">${esc(session.user.email||"")}</div>
-      <button class="btn ghost" id="out">ログアウト</button>
-    </div>
-    <p class="note">手持ちデータはあなたのアカウントにのみ保存され、他の人からは見えません（RLSで保護）。</p>`;
-    document.getElementById("out").addEventListener("click",async()=>{await sb.auth.signOut();toast("ログアウトしました");});
+    main.innerHTML=`<div class="card"><h2>ログイン中</h2><div class="msg ok">${esc(session.user.email||"")}</div><button class="btn ghost" id="out">ログアウト</button></div>
+      <p class="note">手持ちデータはあなたのアカウントにのみ保存され、他の人からは見えません（RLSで保護）。</p>`;
+    document.getElementById("out").addEventListener("click",async()=>{await sb.auth.signOut();ownedDex=new Set();toast("ログアウトしました");});
     return;
   }
-  main.innerHTML=`<div class="card">
-    <h2>ログイン / 新規登録</h2>
+  main.innerHTML=`<div class="card"><h2>ログイン / 新規登録</h2>
     <div class="field"><label>メールアドレス</label><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"></div>
     <div class="field"><label>パスワード</label><input id="pw" type="password" autocomplete="current-password" placeholder="6文字以上"></div>
     <div class="msg" id="amsg"></div>
-    <div class="row2"><button class="btn" id="login" style="flex:1">ログイン</button><button class="btn ghost" id="signup" style="flex:1">新規登録</button></div>
-  </div>
-  <p class="note">理想個体の閲覧はログイン不要です。手持ちの記録にだけアカウントが必要です。新規登録後に確認メールが届く場合があります。</p>`;
-  const em=()=>document.getElementById("email").value.trim();
-  const pw=()=>document.getElementById("pw").value;
+    <div class="row2"><button class="btn" id="login" style="flex:1">ログイン</button><button class="btn ghost" id="signup" style="flex:1">新規登録</button></div></div>
+    <p class="note">理想個体の閲覧はログイン不要。手持ちの記録にだけアカウントが必要です。新規登録後に確認メールが届く場合があります。</p>`;
+  const em=()=>document.getElementById("email").value.trim(),pw=()=>document.getElementById("pw").value;
   const msg=(t,c="")=>{const m=document.getElementById("amsg");m.className="msg "+c;m.textContent=t;};
-  document.getElementById("login").addEventListener("click",async()=>{
-    msg("処理中…");const {error}=await sb.auth.signInWithPassword({email:em(),password:pw()});
-    if(error)msg("ログイン失敗："+error.message,"err");
-  });
-  document.getElementById("signup").addEventListener("click",async()=>{
-    msg("処理中…");const {data,error}=await sb.auth.signUp({email:em(),password:pw()});
-    if(error){msg("登録失敗："+error.message,"err");return;}
-    if(data.session)msg("登録＆ログインしました","ok");
-    else msg("確認メールを送信しました。メール内のリンクを開いてからログインしてください。","ok");
-  });
+  document.getElementById("login").addEventListener("click",async()=>{msg("処理中…");const {error}=await sb.auth.signInWithPassword({email:em(),password:pw()});if(error)msg("ログイン失敗："+error.message,"err");});
+  document.getElementById("signup").addEventListener("click",async()=>{msg("処理中…");const {data,error}=await sb.auth.signUp({email:em(),password:pw()});if(error){msg("登録失敗："+error.message,"err");return;}msg(data.session?"登録＆ログインしました":"確認メールを送信しました。リンクを開いてからログインしてください。","ok");});
 }
 
 /* ---------- toast ---------- */
 let toastT=null;
-function toast(t){
-  let el=document.getElementById("toast");
-  if(!el){el=document.createElement("div");el.id="toast";
-    el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:.85rem;z-index:60;box-shadow:var(--shadow-soft);opacity:0;transition:opacity .2s";
-    document.body.appendChild(el);}
-  el.textContent=t;requestAnimationFrame(()=>el.style.opacity="1");
-  clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity="0",1800);
-}
+function toast(t){let el=document.getElementById("toast");
+  if(!el){el=document.createElement("div");el.id="toast";el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;font-size:.9rem;z-index:60;box-shadow:var(--shadow-soft);opacity:0;transition:opacity .2s";document.body.appendChild(el);}
+  el.textContent=t;requestAnimationFrame(()=>el.style.opacity="1");clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity="0",1800);}
 
 /* ---------- boot ---------- */
-sb.auth.getSession().then(({data})=>{session=data.session;switchTab("search");});
-sb.auth.onAuthStateChange((_e,s)=>{session=s;if(activeTab==="account")renderAccount();if(activeTab==="collection")renderCollection();});
+sb.auth.onAuthStateChange(async(_e,s)=>{const had=!!session;session=s;await loadOwnedDex();if(activeTab==="account")renderAccount();else if(activeTab==="collection")renderCollection();else if(!had&&activeTab==="search")renderSearch();});
+boot();
 </script>
