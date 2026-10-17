@@ -65,6 +65,13 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 .iname{font-size:.8rem;font-weight:700}
 .inum{font-size:.72rem;font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
 
+/* search bar as filter entry */
+.searchbar{width:100%;display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:13px 18px;box-shadow:var(--shadow-soft);color:var(--faint)}
+.searchbar:active{transform:scale(.99)}
+.searchbar .sb-text{flex:1;text-align:left;font-size:1.05rem;color:var(--faint)}
+.searchbar .sb-text.has{color:var(--fg);font-weight:700}
+.searchbar .sb-tune{font-size:1.15rem;color:var(--accent)}
+.clearbtn{background:var(--surface-2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.85rem}
 /* filter entry line */
 .filt-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
 .filt-btn{border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:999px;padding:10px 18px;font-weight:800;font-size:.98rem;display:inline-flex;align-items:center;gap:7px}
@@ -205,11 +212,23 @@ tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(b)switch
 function switchTab(t){activeTab=t;[...tabs.children].forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   if(t==="search")renderSearch();else if(t==="collection")renderCollection();else renderAccount();}
 
+async function fetchAll(table,cols,order){
+  // PostgRESTの1000行上限を回避するためページング取得
+  const all=[]; let from=0; const size=1000;
+  for(;;){
+    const {data,error}=await sb.from(table).select(cols).order(order).range(from,from+size-1);
+    if(error)return{error};
+    all.push(...data);
+    if(data.length<size)break;
+    from+=size;
+  }
+  return{data:all};
+}
 async function boot(){
   main.innerHTML=`<div class="loading">データを読み込み中…</div>`;
   const [sp,fm,ss]=await Promise.all([
-    sb.from("pokemon_species").select("dex,name_ja").order("dex").limit(2000),
-    sb.from("pokemon_forms").select("id,dex,region,form,species_en,type1,type2,rarity").order("id").limit(2000),
+    fetchAll("pokemon_species","dex,name_ja,family_id","dex"),
+    fetchAll("pokemon_forms","id,dex,region,form,species_en,type1,type2,rarity","id"),
     sb.auth.getSession()
   ]);
   if(sp.error||fm.error){main.innerHTML=`<div class="empty"><b>読み込みエラー</b>${esc((sp.error||fm.error).message)}</div>`;return;}
@@ -231,24 +250,27 @@ function renderSearch(){ if(searchView==="filter")renderFilter(); else renderRes
 
 function renderResults(){
   const af=activeFilters();
+  const barTxt=searchState.q.trim()?esc(searchState.q):"名前・図鑑番号・タイプで絞り込む";
   main.innerHTML=`
-    <label class="search">
+    <button class="searchbar" id="openfilter">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-      <input id="q" inputmode="search" placeholder="名前か図鑑番号で検索" value="${esc(searchState.q)}" autocomplete="off">
-    </label>
-    <div class="filt-line">
-      <button class="filt-btn" id="openfilter">⚙ フィルター${af.length?` (${af.length})`:""}</button>
-      ${af.map(f=>`<span class="fchip" data-k="${f[0]}">${f[2]} ${esc(f[1])}<button class="x" data-k="${f[0]}">×</button></span>`).join("")}
-    </div>
+      <span class="sb-text${searchState.q.trim()?" has":""}">${barTxt}</span>
+      <span class="sb-tune">⚙</span>
+    </button>
+    ${af.length?`<div class="filt-line">${af.map(f=>`<span class="fchip" data-k="${f[0]}">${f[2]} ${esc(f[1])}<button class="x" data-k="${f[0]}">×</button></span>`).join("")}</div>`:""}
     <div class="sp-grid" id="splist"></div>`;
-  document.getElementById("q").addEventListener("input",e=>{searchState.q=e.target.value;paintResults();});
   document.getElementById("openfilter").addEventListener("click",()=>{searchView="filter";renderSearch();});
-  main.querySelectorAll(".fchip .x").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.k;if(k==="type")searchState.type=null;if(k==="region")searchState.region=null;if(k==="rarity")searchState.rarity=null;renderResults();}));
+  main.querySelectorAll(".fchip .x").forEach(b=>b.addEventListener("click",ev=>{ev.stopPropagation();const k=b.dataset.k;if(k==="type")searchState.type=null;if(k==="region")searchState.region=null;if(k==="rarity")searchState.rarity=null;renderResults();}));
   paintResults();
 }
 function renderFilter(){
   main.innerHTML=`
-    <div class="fhead"><button class="back" id="fclose">‹ 戻る</button><b>フィルター</b><button class="rchip clear" id="fclear" style="margin-left:auto">クリア</button></div>
+    <div class="fhead"><button class="back" id="fclose">‹ 戻る</button><b>検索・絞り込み</b><button class="clearbtn" id="fclear" style="margin-left:auto">クリア</button></div>
+    <label class="search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="q" inputmode="search" placeholder="名前か図鑑番号（進化系統も表示）" value="${esc(searchState.q)}" autocomplete="off">
+    </label>
+    <p class="note" style="margin:8px 2px 0">例：「イーブイ」でブラッキー等の進化系統も表示。コミュデイのタネ確認に便利。</p>
     <div class="sec-label">タイプ</div>
     <div class="icongrid" id="fg-type">${TYPES.map(t=>`<button class="icell" data-t="${t[0]}" aria-pressed="${searchState.type===t[0]}"><span class="icirc" style="background:${t[2]}">${t[3]}</span><span class="iname">${t[1]}</span><span class="inum">${typeCount[t[0]]||0}</span></button>`).join("")}</div>
     <div class="sec-label">地方</div>
@@ -256,18 +278,26 @@ function renderFilter(){
     <div class="sec-label">レア度</div>
     <div class="icongrid c3" id="fg-rar">${RARITY.map(r=>`<button class="icell" data-r="${r[0]}" aria-pressed="${searchState.rarity===r[0]}"><span class="icirc" style="background:${r[2]}">${r[3]}</span><span class="iname">${r[1]}</span><span class="inum">${rarityCount[r[0]]||0}</span></button>`).join("")}</div>
     <div style="height:84px"></div>
-    <div class="applybar"><button class="btn" id="apply">この条件で表示（${filteredSpecies().length}件）</button></div>`;
+    <div class="applybar"><button class="btn" id="apply">この条件で表示（<span id="fcount">${filteredSpecies().length}</span>件）</button></div>`;
+  const upd=()=>{const el=document.getElementById("fcount");if(el)el.textContent=filteredSpecies().length;};
+  const qi=document.getElementById("q");
+  qi.addEventListener("input",e=>{searchState.q=e.target.value;upd();});
+  qi.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchView="list";renderSearch();}});
   document.getElementById("fclose").addEventListener("click",()=>{searchView="list";renderSearch();});
-  document.getElementById("fclear").addEventListener("click",()=>{searchState.type=null;searchState.region=null;searchState.rarity=null;renderFilter();});
-  document.getElementById("fg-type").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;searchState.type=searchState.type===b.dataset.t?null:b.dataset.t;renderFilter();});
-  document.getElementById("fg-reg").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;const i=+b.dataset.i;searchState.region=searchState.region===i?null:i;renderFilter();});
-  document.getElementById("fg-rar").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;searchState.rarity=searchState.rarity===b.dataset.r?null:b.dataset.r;renderFilter();});
+  document.getElementById("fclear").addEventListener("click",()=>{searchState={q:"",type:null,rarity:null,region:null};renderFilter();});
+  document.getElementById("fg-type").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;searchState.type=searchState.type===b.dataset.t?null:b.dataset.t;b.setAttribute("aria-pressed",searchState.type===b.dataset.t);main.querySelectorAll('#fg-type .icell').forEach(x=>x.setAttribute("aria-pressed",searchState.type===x.dataset.t));upd();});
+  document.getElementById("fg-reg").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;const i=+b.dataset.i;searchState.region=searchState.region===i?null:i;main.querySelectorAll('#fg-reg .icell').forEach(x=>x.setAttribute("aria-pressed",searchState.region===+x.dataset.i));upd();});
+  document.getElementById("fg-rar").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;searchState.rarity=searchState.rarity===b.dataset.r?null:b.dataset.r;main.querySelectorAll('#fg-rar .icell').forEach(x=>x.setAttribute("aria-pressed",searchState.rarity===x.dataset.r));upd();});
   document.getElementById("apply").addEventListener("click",()=>{searchView="list";renderSearch();});
 }
 function filteredSpecies(){
   let arr=speciesAll; const v=searchState.q.trim();
   if(/^\d+$/.test(v))arr=arr.filter(s=>s.dex===+v);
-  else if(v)arr=arr.filter(s=>(s.name_ja||"").includes(v));
+  else if(v){
+    const fams=new Set();
+    speciesAll.forEach(s=>{if((s.name_ja||"").includes(v))fams.add(s.family_id);});
+    arr=arr.filter(s=>fams.has(s.family_id));
+  }
   if(searchState.region!=null){const[,lo,hi]=REGIONS[searchState.region];arr=arr.filter(s=>s.dex>=lo&&s.dex<=hi);}
   if(searchState.type||searchState.rarity)arr=arr.filter(s=>(formsByDex[s.dex]||[]).some(f=>(!searchState.type||f.type1===searchState.type||f.type2===searchState.type)&&(!searchState.rarity||f.rarity===searchState.rarity)));
   return arr;
