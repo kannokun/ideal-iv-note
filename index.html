@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
 <style>
-/* Layout: モバイル1カラム + 下部タブ。GO風タイプグリッド。リーグ色をセマンティックに。 */
+/* Layout: モバイル1カラム + 下部タブ。GO風タイプアイコン、正方形カード、タイプ色ベースの詳細。 */
 :root{
   --bg:#f4f6fb; --surface:#ffffff; --surface-2:#eef1f8; --line:#dfe4ef;
   --fg:#1b2130; --muted:#5d6782; --faint:#8a93ab;
@@ -40,7 +40,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-main);font-size:1r
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
 h1,h2,h3{margin:0;text-wrap:balance;font-weight:800}
 button{font-family:inherit;cursor:pointer}
-input,select,textarea{font-family:inherit;font-size:1rem}
+input{font-family:inherit;font-size:1rem}
 .num{font-variant-numeric:tabular-nums}
 
 #app{min-height:100%;display:flex;flex-direction:column}
@@ -48,48 +48,58 @@ header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;backgroun
 .bar-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;display:flex;align-items:center;gap:10px}
 .brand{font-weight:800;font-size:1.1rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
 .brand .dot{width:13px;height:13px;border-radius:50%;background:linear-gradient(135deg,var(--sl),var(--ml));box-shadow:inset 0 0 0 2px var(--surface)}
-main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:16px;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));max-width:760px;width:100%;margin:0 auto}
+main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:16px;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));max-width:760px;width:100%;margin:0 auto}
 
 .search{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:12px 18px;box-shadow:var(--shadow-soft)}
 .search input{border:0;background:transparent;color:var(--fg);width:100%;outline:none;font-size:1.05rem}
 .search svg{flex:none;color:var(--faint)}
 .sec-label{font-size:.82rem;font-weight:800;color:var(--faint);letter-spacing:.08em;margin:18px 2px 8px}
 
-/* GO風タイプグリッド */
-.typegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.tcell{display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:0;padding:4px 0}
-.tcirc{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;box-shadow:var(--shadow-soft);border:3px solid transparent;transition:transform .08s}
-.tcell[aria-pressed="true"] .tcirc{border-color:var(--fg);transform:scale(1.06)}
-.tcell:active .tcirc{transform:scale(.96)}
-.tname{font-size:.8rem;font-weight:700;color:var(--fg)}
-.tnum{font-size:.74rem;font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
+/* icon grids (type / region / rarity) */
+.icongrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.icongrid.c3{grid-template-columns:repeat(3,1fr)}
+.icell{display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:0;padding:4px 0;color:inherit}
+.icirc{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;box-shadow:var(--shadow-soft);border:3px solid transparent;transition:transform .08s}
+.icell[aria-pressed="true"] .icirc{border-color:var(--fg);transform:scale(1.07)}
+.icell:active .icirc{transform:scale(.95)}
+.iname{font-size:.8rem;font-weight:700}
+.inum{font-size:.72rem;font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
 
-.chiprow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.rchip{border:1.5px solid var(--rc,var(--line));background:transparent;color:var(--fg);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.92rem}
-.rchip[aria-pressed="true"]{background:var(--rc,var(--accent));color:#fff;border-color:transparent}
-.rchip.clear{border-color:var(--line);color:var(--muted)}
-.regchip{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 15px;font-weight:700;font-size:.92rem}
-.regchip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:transparent}
+/* filter entry line */
+.filt-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.filt-btn{border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:999px;padding:10px 18px;font-weight:800;font-size:.98rem;display:inline-flex;align-items:center;gap:7px}
+.fchip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 12px;font-weight:700;font-size:.85rem}
+.fchip .x{color:var(--faint);font-weight:800;font-size:1rem}
 
-.list{display:flex;flex-direction:column;gap:9px;margin-top:10px}
-.sp-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;width:100%;color:inherit;box-shadow:var(--shadow-soft)}
-.sp-row:active{transform:scale(.99)}
-.dex{font-family:var(--f-num);color:var(--faint);font-size:.85rem;min-width:52px}
-.sp-name{font-weight:700;flex:1;min-width:0;font-size:1.05rem}
-.sp-mini{display:flex;gap:4px}
-.mini-t{width:14px;height:14px;border-radius:50%}
-.sp-own{font-size:.76rem;font-weight:800;color:var(--good);background:color-mix(in srgb,var(--good) 16%,transparent);padding:3px 10px;border-radius:999px;white-space:nowrap}
-.chev{color:var(--faint);font-size:1.2rem}
+/* species cards */
+.sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;margin-top:12px}
+.sp-card{position:relative;aspect-ratio:1/1;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px;color:inherit;overflow:hidden}
+.sp-card:active{transform:scale(.97)}
+.sp-card .c-strip{position:absolute;top:0;left:0;right:0;height:7px}
+.sp-card .c-dex{position:absolute;top:10px;left:10px;font-family:var(--f-num);font-size:.66rem;color:var(--faint)}
+.sp-card .c-own{position:absolute;top:9px;right:9px;font-size:.62rem;font-weight:800;color:#fff;background:var(--good);padding:2px 7px;border-radius:999px}
+.sp-card .c-name{font-weight:800;font-size:1rem;text-align:center;line-height:1.15}
+.sp-card .c-types{display:flex;gap:4px}
+.mini-t{width:13px;height:13px;border-radius:50%}
+.count-note{text-align:center;color:var(--faint);font-size:.82rem;margin-top:12px;grid-column:1/-1}
 
+/* apply bar */
+.applybar{position:fixed;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:35;display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-left,0px))}
+.applybar .btn{width:100%;max-width:560px;box-shadow:0 10px 26px rgba(0,0,0,.22)}
+.fhead{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.fhead b{font-size:1.15rem}
+
+/* detail */
 .back{background:var(--surface-2);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:9px 16px;font-weight:700;font-size:.92rem;display:inline-flex;gap:6px;align-items:center;margin-bottom:12px}
-.detail-head{display:flex;align-items:baseline;gap:10px;margin:4px 2px 2px}
-.detail-head .d-dex{font-family:var(--f-num);color:var(--faint);font-size:.9rem}
-.detail-head h2{font-size:1.5rem}
-.detail-types{display:flex;gap:6px;margin:4px 2px 0}
-.tbadge{font-size:.82rem;font-weight:700;color:#fff;padding:3px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+.hero{border-radius:20px;padding:18px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow-soft)}
+.hero-dex{font-family:var(--f-num);font-size:.92rem;opacity:.9}
+.hero-name{font-size:1.75rem;margin:2px 0 10px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.28)}
+.hero-types{display:flex;gap:6px}
+.tbadge{font-size:.82rem;font-weight:700;color:#fff;padding:4px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+.hero .tbadge{background:rgba(255,255,255,.24)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:9px 15px;font-weight:700;font-size:.9rem}
-.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:transparent}
+.chip[aria-pressed="true"]{color:#fff;background:var(--theme,var(--accent));border-color:transparent}
 .lg-tabs{display:flex;gap:8px;margin:12px 0 4px}
 .lg-tab{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 6px;font-weight:800;font-size:.95rem;color:var(--muted)}
 .lg-tab .lg-cap{display:block;font-size:.7rem;font-weight:700;color:var(--faint);margin-top:2px}
@@ -99,33 +109,32 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 .lg-tab[aria-pressed="true"] .lg-cap{color:inherit;opacity:.85}
 
 .ranks{display:flex;flex-direction:column;gap:9px;margin-top:10px}
-.rk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;gap:10px}
-.rk.owned{border-color:color-mix(in srgb,var(--good) 55%,var(--line))}
+.rk{background:color-mix(in srgb,var(--theme,transparent) 7%,var(--surface));border:1px solid var(--line);border-left:5px solid var(--theme,var(--line));border-radius:12px;padding:13px 15px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;gap:10px}
+.rk.owned{border-color:color-mix(in srgb,var(--good) 55%,var(--line));border-left-color:var(--good)}
 .rk-top{display:flex;align-items:center;gap:12px}
 .rk-no{width:32px;height:32px;flex:none;border-radius:9px;background:var(--surface-2);color:var(--muted);font-weight:800;display:grid;place-items:center;font-size:.95rem}
 .rk.owned .rk-no{background:var(--good);color:#fff}
-.iv{font-family:var(--f-num);font-weight:700;font-size:1.15rem;letter-spacing:.01em}
+.iv{font-family:var(--f-num);font-weight:700;font-size:1.15rem}
 .rk-meta{margin-left:auto;text-align:right;color:var(--muted);font-size:.82rem;font-family:var(--f-num)}
 .rk-meta b{color:var(--fg);font-size:.98rem}
-.addbtn{flex:none;border:1px dashed var(--line);background:transparent;color:var(--accent);border-radius:10px;padding:8px 11px;font-weight:800;font-size:.85rem}
+.addbtn{flex:none;border:1px dashed var(--line);background:var(--surface);color:var(--accent);border-radius:10px;padding:8px 11px;font-weight:800;font-size:.85rem}
 .haves{display:flex;flex-wrap:wrap;gap:6px}
-.have{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:5px 7px 5px 11px;font-size:.8rem;font-weight:700}
+.have{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 7px 5px 11px;font-size:.8rem;font-weight:700}
 .tag{font-size:.7rem;font-weight:800;padding:2px 7px;border-radius:999px;line-height:1}
 .t-sh{color:#fff;background:var(--shadow)} .t-pu{color:#fff;background:#3f8f6a}
 .t-xl{color:#fff;background:#c0485a} .t-xs{color:#fff;background:#4a74c0}
 .t-shiny{color:#3a2d06;background:var(--shiny)} .t-lucky{color:#3a2d06;background:var(--lucky)}
 .have .del{border:0;background:transparent;color:var(--faint);font-weight:800;font-size:1.05rem;line-height:1;padding:0 2px}
 
-/* collection stats */
 .stats{display:flex;flex-direction:column;gap:9px;margin:4px 0 6px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-soft)}
 .stat-top{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
-.stat-top b{font-size:1rem} .stat-top .frac{margin-left:auto;font-family:var(--f-num);font-weight:800;color:var(--muted)}
+.stat-top .ico{font-size:1.1rem} .stat-top b{font-size:1rem}
+.stat-top .frac{margin-left:auto;font-family:var(--f-num);font-weight:800;color:var(--muted)}
 .stat-top .comp{margin-left:auto;font-weight:800;color:var(--good);font-size:.9rem}
 .bar{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden}
 .bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--ml));border-radius:999px}
 .stat.done{border-color:color-mix(in srgb,var(--good) 55%,var(--line))}
-
 .coll-group{margin-top:16px}
 .coll-group h3{font-size:1.05rem;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
 .coll-group h3 .g-dex{font-family:var(--f-num);color:var(--faint);font-size:.82rem;font-weight:700}
@@ -141,7 +150,7 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 .btn:disabled{opacity:.55}
 .msg{font-size:.88rem;color:var(--muted)} .msg.err{color:var(--danger)} .msg.ok{color:var(--good)}
 
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:38;background:color-mix(in srgb,var(--surface) 95%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 nav.tabs button{flex:1;border:0;background:transparent;color:var(--faint);padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.72rem;font-weight:700}
 nav.tabs button[aria-selected="true"]{color:var(--accent)}
 nav.tabs svg{width:24px;height:24px}
@@ -183,20 +192,19 @@ const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefr
 const LEAGUES={1:{name:"スーパー",cap:"CP1500"},2:{name:"ハイパー",cap:"CP2500"},3:{name:"マスター",cap:"制限なし"}};
 const TYPES=[["normal","ノーマル","#9298a3","⚪"],["fire","ほのお","#f05a3f","🔥"],["water","みず","#3692dc","💧"],["grass","くさ","#4aa84a","🍃"],["electric","でんき","#e0bb2e","⚡"],["ice","こおり","#5cc6d0","❄️"],["fighting","かくとう","#d8433f","🥊"],["poison","どく","#9a5bc2","☠️"],["ground","じめん","#cf9b50","⛰️"],["flying","ひこう","#8aa7e0","🕊️"],["psychic","エスパー","#ef6aa0","🔮"],["bug","むし","#9bb52b","🐛"],["rock","いわ","#b6a95f","🪨"],["ghost","ゴースト","#6b5a99","👻"],["dragon","ドラゴン","#5a66d8","🐉"],["dark","あく","#6d5a56","🌙"],["steel","はがね","#6aa5bc","⚙️"],["fairy","フェアリー","#e48ad8","✨"]];
 const TYPEMAP=Object.fromEntries(TYPES.map(t=>[t[0],t]));
-const RARITY=[["legendary","伝説","#b07b2e"],["mythical","幻","#b5497f"],["ultra_beast","UB","#3f9f8f"]];
-const REGIONS=[["カントー",1,151],["ジョウト",152,251],["ホウエン",252,386],["シンオウ",387,493],["イッシュ",494,649],["カロス",650,721],["アローラ",722,809],["ガラル",810,898],["ヒスイ",899,905],["パルデア",906,1025]];
+const RARITY=[["legendary","伝説","#b07b2e","👑"],["mythical","幻","#b5497f","🌟"],["ultra_beast","UB","#3f9f8f","🛸"]];
+const REGIONS=[["カントー",1,151,"🗼"],["ジョウト",152,251,"⛩️"],["ホウエン",252,386,"🌊"],["シンオウ",387,493,"⛰️"],["イッシュ",494,649,"🗽"],["カロス",650,721,"🥐"],["アローラ",722,809,"🌺"],["ガラル",810,898,"🏰"],["ヒスイ",899,905,"🏔️"],["パルデア",906,1025,"🌅"]];
 
 const main=document.getElementById("main");
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let session=null, activeTab="search";
-let speciesAll=[], formsByDex={}, formCache={}, speciesName={}, typeCount={}, ownedDex=new Set();
+let speciesAll=[], formsByDex={}, formCache={}, speciesName={}, typeCount={}, regionCount=[], rarityCount={}, ownedDex=new Set();
 
 const tabs=document.getElementById("tabs");
 tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(b)switchTab(b.dataset.tab);});
 function switchTab(t){activeTab=t;[...tabs.children].forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   if(t==="search")renderSearch();else if(t==="collection")renderCollection();else renderAccount();}
 
-/* ---------- boot: load reference data once ---------- */
 async function boot(){
   main.innerHTML=`<div class="loading">データを読み込み中…</div>`;
   const [sp,fm,ss]=await Promise.all([
@@ -207,43 +215,54 @@ async function boot(){
   if(sp.error||fm.error){main.innerHTML=`<div class="empty"><b>読み込みエラー</b>${esc((sp.error||fm.error).message)}</div>`;return;}
   speciesAll=sp.data; speciesAll.forEach(s=>speciesName[s.dex]=s.name_ja);
   fm.data.forEach(f=>{formCache[f.id]=f;(formsByDex[f.dex]=formsByDex[f.dex]||[]).push(f);});
-  TYPES.forEach(t=>typeCount[t[0]]=0);
-  speciesAll.forEach(s=>{const set=new Set();(formsByDex[s.dex]||[]).forEach(f=>{if(f.type1)set.add(f.type1);if(f.type2)set.add(f.type2);});set.forEach(t=>{if(typeCount[t]!=null)typeCount[t]++;});});
-  session=ss.data.session;
-  if(session)await loadOwnedDex();
+  TYPES.forEach(t=>typeCount[t[0]]=0); RARITY.forEach(r=>rarityCount[r[0]]=0);
+  speciesAll.forEach(s=>{const ts=new Set(),rs=new Set();(formsByDex[s.dex]||[]).forEach(f=>{if(f.type1)ts.add(f.type1);if(f.type2)ts.add(f.type2);if(f.rarity)rs.add(f.rarity);});ts.forEach(t=>{if(typeCount[t]!=null)typeCount[t]++;});rs.forEach(r=>{if(rarityCount[r]!=null)rarityCount[r]++;});});
+  regionCount=REGIONS.map(([,lo,hi])=>speciesAll.filter(s=>s.dex>=lo&&s.dex<=hi).length);
+  session=ss.data.session; if(session)await loadOwnedDex();
   switchTab("search");
 }
-async function loadOwnedDex(){
-  ownedDex=new Set();
-  if(!session)return;
-  const {data}=await sb.from("user_collection").select("form_id");
-  (data||[]).forEach(r=>{const f=formCache[r.form_id];if(f)ownedDex.add(f.dex);});
-}
+async function loadOwnedDex(){ownedDex=new Set();if(!session)return;const {data}=await sb.from("user_collection").select("form_id");(data||[]).forEach(r=>{const f=formCache[r.form_id];if(f)ownedDex.add(f.dex);});}
 
-/* ---------- SEARCH ---------- */
+/* ---------- SEARCH (results view + filter view) ---------- */
 let searchState={q:"",type:null,rarity:null,region:null};
-function renderSearch(){
+let searchView="list";
+function activeFilters(){const a=[];if(searchState.type)a.push(["type",TYPEMAP[searchState.type][1],TYPEMAP[searchState.type][3]]);if(searchState.region!=null)a.push(["region",REGIONS[searchState.region][0],REGIONS[searchState.region][3]]);if(searchState.rarity){const r=RARITY.find(x=>x[0]===searchState.rarity);a.push(["rarity",r[1],r[3]]);}return a;}
+function renderSearch(){ if(searchView==="filter")renderFilter(); else renderResults(); }
+
+function renderResults(){
+  const af=activeFilters();
   main.innerHTML=`
     <label class="search">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
       <input id="q" inputmode="search" placeholder="名前か図鑑番号で検索" value="${esc(searchState.q)}" autocomplete="off">
     </label>
-    <div class="sec-label">タイプ</div>
-    <div class="typegrid" id="typegrid">${TYPES.map(t=>`
-      <button class="tcell" data-t="${t[0]}" aria-pressed="${searchState.type===t[0]}">
-        <span class="tcirc" style="background:${t[2]}">${t[3]}</span>
-        <span class="tname">${t[1]}</span><span class="tnum">${typeCount[t[0]]||0}</span>
-      </button>`).join("")}</div>
-    <div class="sec-label">地方</div>
-    <div class="chiprow" id="regrow">${REGIONS.map((r,i)=>`<button class="regchip" data-i="${i}" aria-pressed="${searchState.region===i}">${r[0]}</button>`).join("")}</div>
-    <div class="sec-label">レア度</div>
-    <div class="chiprow" id="rrow">${RARITY.map(r=>`<button class="rchip" data-r="${r[0]}" aria-pressed="${searchState.rarity===r[0]}" style="--rc:${r[2]}">${r[1]}</button>`).join("")}<button class="rchip clear" id="clearf">すべて解除</button></div>
-    <div class="list" id="splist"></div>`;
+    <div class="filt-line">
+      <button class="filt-btn" id="openfilter">⚙ フィルター${af.length?` (${af.length})`:""}</button>
+      ${af.map(f=>`<span class="fchip" data-k="${f[0]}">${f[2]} ${esc(f[1])}<button class="x" data-k="${f[0]}">×</button></span>`).join("")}
+    </div>
+    <div class="sp-grid" id="splist"></div>`;
   document.getElementById("q").addEventListener("input",e=>{searchState.q=e.target.value;paintResults();});
-  document.getElementById("typegrid").addEventListener("click",e=>{const b=e.target.closest(".tcell");if(!b)return;searchState.type=searchState.type===b.dataset.t?null:b.dataset.t;renderSearch();});
-  document.getElementById("regrow").addEventListener("click",e=>{const b=e.target.closest(".regchip");if(!b)return;const i=+b.dataset.i;searchState.region=searchState.region===i?null:i;renderSearch();});
-  document.getElementById("rrow").addEventListener("click",e=>{if(e.target.closest("#clearf")){searchState={q:searchState.q,type:null,rarity:null,region:null};renderSearch();return;}const b=e.target.closest(".rchip");if(!b)return;searchState.rarity=searchState.rarity===b.dataset.r?null:b.dataset.r;renderSearch();});
+  document.getElementById("openfilter").addEventListener("click",()=>{searchView="filter";renderSearch();});
+  main.querySelectorAll(".fchip .x").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.k;if(k==="type")searchState.type=null;if(k==="region")searchState.region=null;if(k==="rarity")searchState.rarity=null;renderResults();}));
   paintResults();
+}
+function renderFilter(){
+  main.innerHTML=`
+    <div class="fhead"><button class="back" id="fclose">‹ 戻る</button><b>フィルター</b><button class="rchip clear" id="fclear" style="margin-left:auto">クリア</button></div>
+    <div class="sec-label">タイプ</div>
+    <div class="icongrid" id="fg-type">${TYPES.map(t=>`<button class="icell" data-t="${t[0]}" aria-pressed="${searchState.type===t[0]}"><span class="icirc" style="background:${t[2]}">${t[3]}</span><span class="iname">${t[1]}</span><span class="inum">${typeCount[t[0]]||0}</span></button>`).join("")}</div>
+    <div class="sec-label">地方</div>
+    <div class="icongrid" id="fg-reg">${REGIONS.map((r,i)=>`<button class="icell" data-i="${i}" aria-pressed="${searchState.region===i}"><span class="icirc" style="background:var(--surface-2)">${r[3]}</span><span class="iname">${r[0]}</span><span class="inum">${regionCount[i]||0}</span></button>`).join("")}</div>
+    <div class="sec-label">レア度</div>
+    <div class="icongrid c3" id="fg-rar">${RARITY.map(r=>`<button class="icell" data-r="${r[0]}" aria-pressed="${searchState.rarity===r[0]}"><span class="icirc" style="background:${r[2]}">${r[3]}</span><span class="iname">${r[1]}</span><span class="inum">${rarityCount[r[0]]||0}</span></button>`).join("")}</div>
+    <div style="height:84px"></div>
+    <div class="applybar"><button class="btn" id="apply">この条件で表示（${filteredSpecies().length}件）</button></div>`;
+  document.getElementById("fclose").addEventListener("click",()=>{searchView="list";renderSearch();});
+  document.getElementById("fclear").addEventListener("click",()=>{searchState.type=null;searchState.region=null;searchState.rarity=null;renderFilter();});
+  document.getElementById("fg-type").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;searchState.type=searchState.type===b.dataset.t?null:b.dataset.t;renderFilter();});
+  document.getElementById("fg-reg").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;const i=+b.dataset.i;searchState.region=searchState.region===i?null:i;renderFilter();});
+  document.getElementById("fg-rar").addEventListener("click",e=>{const b=e.target.closest(".icell");if(!b)return;searchState.rarity=searchState.rarity===b.dataset.r?null:b.dataset.r;renderFilter();});
+  document.getElementById("apply").addEventListener("click",()=>{searchView="list";renderSearch();});
 }
 function filteredSpecies(){
   let arr=speciesAll; const v=searchState.q.trim();
@@ -256,39 +275,45 @@ function filteredSpecies(){
 function paintResults(){
   const list=document.getElementById("splist"); if(!list)return;
   const data=filteredSpecies();
-  if(!data.length){list.innerHTML=`<div class="empty"><b>該当なし</b>条件を変えてみてください。</div>`;return;}
-  const cap=data.slice(0,300);
+  if(!data.length){list.innerHTML=`<div class="empty" style="grid-column:1/-1"><b>該当なし</b>条件を変えてみてください。</div>`;return;}
+  const cap=data.slice(0,150);
   list.innerHTML=cap.map(s=>{
     const fs=formsByDex[s.dex]||[]; const tset=[]; fs.forEach(f=>{[f.type1,f.type2].forEach(t=>{if(t&&!tset.includes(t))tset.push(t);});});
+    const c1=(TYPEMAP[tset[0]]||[])[2]||'var(--line)';
     const mini=tset.slice(0,3).map(t=>`<span class="mini-t" style="background:${(TYPEMAP[t]||[])[2]||'#999'}"></span>`).join("");
-    return `<button class="sp-row" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
-      <span class="dex num">No.${s.dex}</span>
-      <span class="sp-name">${esc(s.name_ja)}</span>
-      <span class="sp-mini">${mini}</span>
-      ${ownedDex.has(s.dex)?`<span class="sp-own">所持</span>`:""}
-      <span class="chev">›</span></button>`;
-  }).join("")+(data.length>300?`<div class="note" style="text-align:center">他 ${data.length-300} 件。検索で絞り込んでください。</div>`:"");
-  list.querySelectorAll(".sp-row").forEach(b=>b.addEventListener("click",()=>openSpecies(+b.dataset.dex,b.dataset.name)));
+    return `<button class="sp-card" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
+      <span class="c-strip" style="background:${c1}"></span>
+      <span class="c-dex num">${s.dex}</span>
+      ${ownedDex.has(s.dex)?`<span class="c-own">所持</span>`:""}
+      <span class="c-name">${esc(s.name_ja)}</span>
+      <span class="c-types">${mini}</span></button>`;
+  }).join("")+(data.length>150?`<div class="count-note">他 ${data.length-150} 件。検索やフィルターで絞り込んでください。</div>`:"");
+  list.querySelectorAll(".sp-card").forEach(b=>b.addEventListener("click",()=>openSpecies(+b.dataset.dex,b.dataset.name)));
 }
 
 /* ---------- DETAIL ---------- */
 let detail={dex:null,name:"",forms:[],formId:null,league:1};
 function openSpecies(dex,name){
-  const fs=(formsByDex[dex]||[]).slice();
+  const fs=(formsByDex[dex]||[]).slice().sort((a,b)=>{const ab=(!a.region&&!a.form)?0:1,bb=(!b.region&&!b.form)?0:1;return ab-bb||a.id-b.id;});
   detail={dex,name,forms:fs,formId:fs[0]?.id??null,league:1};
   renderDetail();
 }
 function formLabel(f){return f.region||f.form||"通常";}
-function typeBadges(f){if(!f)return"";return [f.type1,f.type2].filter(Boolean).map(t=>{const m=TYPEMAP[t];return m?`<span class="tbadge" style="background:${m[2]}">${m[3]} ${m[1]}</span>`:"";}).join("");}
+function typeBadges(f){if(!f)return"";return [f.type1,f.type2].filter(Boolean).map(t=>{const m=TYPEMAP[t];return m?`<span class="tbadge">${m[3]} ${m[1]}</span>`:"";}).join("");}
 function renderDetail(){
-  const fs=detail.forms;
+  const fs=detail.forms, cur=fs.find(f=>f.id===detail.formId);
+  const c1=(TYPEMAP[cur&&cur.type1]||[])[2]||'#7a8296';
+  const c2=(TYPEMAP[cur&&cur.type2]||TYPEMAP[cur&&cur.type1]||[])[2]||c1;
   main.innerHTML=`
-    <button class="back" id="back">‹ 検索にもどる</button>
-    <div class="detail-head"><span class="d-dex num">No.${detail.dex}</span><h2>${esc(detail.name)}</h2></div>
-    <div class="detail-types">${typeBadges(fs.find(f=>f.id===detail.formId))}</div>
-    ${fs.length>1?`<div class="chips" id="formchips">${fs.map(f=>`<button class="chip" data-id="${f.id}" aria-pressed="${f.id===detail.formId}">${esc(formLabel(f))}</button>`).join("")}</div>`:""}
+    <button class="back" id="back">‹ もどる</button>
+    <div class="hero" style="background:linear-gradient(135deg,${c1},${c2})">
+      <div class="hero-dex num">No.${detail.dex}</div>
+      <h2 class="hero-name">${esc(detail.name)}</h2>
+      <div class="hero-types">${typeBadges(cur)}</div>
+    </div>
+    ${fs.length>1?`<div class="chips" id="formchips" style="--theme:${c1}">${fs.map(f=>`<button class="chip" data-id="${f.id}" aria-pressed="${f.id===detail.formId}">${esc(formLabel(f))}</button>`).join("")}</div>`:`<div style="height:4px"></div>`}
     <div class="lg-tabs" id="lgtabs">${[1,2,3].map(l=>`<button class="lg-tab" data-lg="${l}" aria-pressed="${l===detail.league}">${LEAGUES[l].name}<span class="lg-cap">${LEAGUES[l].cap}</span></button>`).join("")}</div>
-    <div class="ranks" id="ranks"></div>`;
+    <div class="ranks" id="ranks" style="--theme:${c1}"></div>`;
   document.getElementById("back").addEventListener("click",()=>switchTab("search"));
   const fc=document.getElementById("formchips"); if(fc)fc.addEventListener("click",e=>{const b=e.target.closest(".chip");if(b){detail.formId=+b.dataset.id;renderDetail();}});
   document.getElementById("lgtabs").addEventListener("click",e=>{const b=e.target.closest(".lg-tab");if(b){detail.league=+b.dataset.lg;renderDetail();}});
@@ -305,8 +330,7 @@ async function loadRanking(){
   const byRank={}; owned.forEach(o=>{(byRank[o.rank]=byRank[o.rank]||[]).push(o);});
   box.innerHTML=ideal.map(r=>{const haves=byRank[r.rank]||[];
     return `<div class="rk${haves.length?" owned":""}"><div class="rk-top">
-      <span class="rk-no num">${r.rank}</span>
-      <span class="iv num">${r.atk_iv}/${r.def_iv}/${r.hp_iv}</span>
+      <span class="rk-no num">${r.rank}</span><span class="iv num">${r.atk_iv}/${r.def_iv}/${r.hp_iv}</span>
       <span class="rk-meta"><b>${r.cp}</b> CP<br>Lv${(+r.level).toFixed(1)}</span>
       <button class="addbtn" data-rank="${r.rank}">＋登録</button>
     </div>${haves.length?`<div class="haves">${haves.map(haveChip).join("")}</div>`:""}</div>`;
@@ -336,8 +360,8 @@ function openRegister(rank){
     <div class="row2"><button class="btn ghost" id="cancel" style="flex:1">やめる</button><button class="btn" id="save" style="flex:2">登録する</button></div></div>`;
   document.body.appendChild(scrim);
   scrim.addEventListener("click",e=>{if(e.target===scrim)scrim.remove();});
-  scrim.querySelector("#st").addEventListener("click",e=>seg(e));
-  scrim.querySelector("#sz").addEventListener("click",e=>seg(e));
+  scrim.querySelector("#st").addEventListener("click",seg);
+  scrim.querySelector("#sz").addEventListener("click",seg);
   scrim.querySelector("#cancel").addEventListener("click",()=>scrim.remove());
   scrim.querySelector("#save").addEventListener("click",async()=>{
     const btn=scrim.querySelector("#save");btn.disabled=true;
@@ -359,13 +383,11 @@ async function renderCollection(){
   main.innerHTML=`<div class="loading">手持ちを読み込み中…</div>`;
   const {data,error}=await sb.from("user_collection").select("id,form_id,league_id,rank,is_shadow,is_purified,is_shiny,is_lucky,size,memo").order("created_at",{ascending:false});
   if(error){main.innerHTML=`<div class="empty">読み込みエラー：${esc(error.message)}</div>`;return;}
-  const owned=new Set(); data.forEach(d=>{const f=formCache[d.form_id];if(f)owned.add(f.dex);});
-  ownedDex=owned;
-  // region stats
-  const stats=REGIONS.map(([name,lo,hi])=>{const total=speciesAll.filter(s=>s.dex>=lo&&s.dex<=hi).length;const own=[...owned].filter(d=>d>=lo&&d<=hi).length;return {name,total,own};}).filter(r=>r.total>0);
-  let html=`<div class="sec-label">地方コンプ状況（このアプリ収録種のうち所持数）</div><div class="stats">`+
+  const owned=new Set(); data.forEach(d=>{const f=formCache[d.form_id];if(f)owned.add(f.dex);}); ownedDex=owned;
+  const stats=REGIONS.map(([name,lo,hi],i)=>({name,ico:REGIONS[i][3],total:regionCount[i],own:[...owned].filter(d=>d>=lo&&d<=hi).length})).filter(r=>r.total>0);
+  let html=`<div class="sec-label">地方コンプ状況（アプリ収録種のうち所持数）</div><div class="stats">`+
     stats.map(r=>{const pct=r.total?Math.round(r.own/r.total*100):0;const done=r.own>=r.total&&r.total>0;
-      return `<div class="stat${done?" done":""}"><div class="stat-top"><b>${r.name}</b>${done?`<span class="comp">コンプ！🎉</span>`:`<span class="frac">${r.own} / ${r.total}</span>`}</div><div class="bar"><span style="width:${pct}%"></span></div></div>`;
+      return `<div class="stat${done?" done":""}"><div class="stat-top"><span class="ico">${r.ico}</span><b>${r.name}</b>${done?`<span class="comp">コンプ！🎉</span>`:`<span class="frac">${r.own} / ${r.total}</span>`}</div><div class="bar"><span style="width:${pct}%"></span></div></div>`;
     }).join("")+`</div>`;
   if(!data.length){html+=`<div class="empty"><b>まだ手持ちがありません</b>検索からポケモンを開き「＋登録」で追加しましょう。</div>`;main.innerHTML=html;return;}
   const groups={}; data.forEach(d=>{const dx=(formCache[d.form_id]||{}).dex;(groups[dx]=groups[dx]||[]).push(d);});
@@ -400,13 +422,11 @@ function renderAccount(){
   document.getElementById("signup").addEventListener("click",async()=>{msg("処理中…");const {data,error}=await sb.auth.signUp({email:em(),password:pw()});if(error){msg("登録失敗："+error.message,"err");return;}msg(data.session?"登録＆ログインしました":"確認メールを送信しました。リンクを開いてからログインしてください。","ok");});
 }
 
-/* ---------- toast ---------- */
 let toastT=null;
 function toast(t){let el=document.getElementById("toast");
-  if(!el){el=document.createElement("div");el.id="toast";el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;font-size:.9rem;z-index:60;box-shadow:var(--shadow-soft);opacity:0;transition:opacity .2s";document.body.appendChild(el);}
+  if(!el){el=document.createElement("div");el.id="toast";el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;font-size:.9rem;z-index:60;box-shadow:var(--shadow-soft);opacity:0;transition:opacity .2s";document.body.appendChild(el);}
   el.textContent=t;requestAnimationFrame(()=>el.style.opacity="1");clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity="0",1800);}
 
-/* ---------- boot ---------- */
-sb.auth.onAuthStateChange(async(_e,s)=>{const had=!!session;session=s;await loadOwnedDex();if(activeTab==="account")renderAccount();else if(activeTab==="collection")renderCollection();else if(!had&&activeTab==="search")renderSearch();});
+sb.auth.onAuthStateChange(async(_e,s)=>{const had=!!session;session=s;await loadOwnedDex();if(activeTab==="account")renderAccount();else if(activeTab==="collection")renderCollection();else if(!had&&activeTab==="search"&&searchView==="list")renderSearch();});
 boot();
 </script>
