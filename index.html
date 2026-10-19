@@ -195,6 +195,8 @@ nav.tabs svg{width:24px;height:24px}
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+// 公開参照データ(種族/フォーム/個体値)専用クライアント。常に匿名キーで読むため、ログイン状態に左右されない
+const sbPub=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 
 const LEAGUES={1:{name:"スーパー",cap:"CP1500"},2:{name:"ハイパー",cap:"CP2500"},3:{name:"マスター",cap:"制限なし"}};
 const TYPES=[["normal","ノーマル","#9298a3","⚪"],["fire","ほのお","#f05a3f","🔥"],["water","みず","#3692dc","💧"],["grass","くさ","#4aa84a","🍃"],["electric","でんき","#e0bb2e","⚡"],["ice","こおり","#5cc6d0","❄️"],["fighting","かくとう","#d8433f","🥊"],["poison","どく","#9a5bc2","☠️"],["ground","じめん","#cf9b50","⛰️"],["flying","ひこう","#8aa7e0","🕊️"],["psychic","エスパー","#ef6aa0","🔮"],["bug","むし","#9bb52b","🐛"],["rock","いわ","#b6a95f","🪨"],["ghost","ゴースト","#6b5a99","👻"],["dragon","ドラゴン","#5a66d8","🐉"],["dark","あく","#6d5a56","🌙"],["steel","はがね","#6aa5bc","⚙️"],["fairy","フェアリー","#e48ad8","✨"]];
@@ -216,7 +218,7 @@ async function fetchAll(table,cols,order){
   // PostgRESTの1000行上限を回避するためページング取得
   const all=[]; let from=0; const size=1000;
   for(;;){
-    const {data,error}=await sb.from(table).select(cols).order(order).range(from,from+size-1);
+    const {data,error}=await sbPub.from(table).select(cols).order(order).range(from,from+size-1);
     if(error)return{error};
     all.push(...data);
     if(data.length<size)break;
@@ -240,7 +242,7 @@ async function boot(){
   session=ss.data.session; if(session)await loadOwnedDex();
   switchTab("search");
 }
-async function loadOwnedDex(){ownedDex=new Set();if(!session)return;const {data}=await sb.from("user_collection").select("form_id");(data||[]).forEach(r=>{const f=formCache[r.form_id];if(f)ownedDex.add(f.dex);});}
+async function loadOwnedDex(){ownedDex=new Set();if(!session)return;try{const {data}=await sb.from("user_collection").select("form_id");(data||[]).forEach(r=>{const f=formCache[r.form_id];if(f)ownedDex.add(f.dex);});}catch(_){}}
 
 /* ---------- SEARCH (results view + filter view) ---------- */
 let searchState={q:"",type:null,rarity:null,region:null};
@@ -352,11 +354,11 @@ function renderDetail(){
 async function loadRanking(){
   const box=document.getElementById("ranks"); box.innerHTML=`<div class="loading">理想個体を取得中…</div>`;
   const fid=detail.formId,lg=detail.league;
-  const [{data:ideal,error:e1},owned]=await Promise.all([
-    sb.from("ideal_ivs").select("rank,atk_iv,def_iv,hp_iv,level,cp").eq("form_id",fid).eq("league_id",lg).order("rank"),
-    loadOwned(fid,lg)
-  ]);
+  // 個体値(公開データ)は匿名クライアントで取得＝ログイン状態に影響されない
+  const {data:ideal,error:e1}=await sbPub.from("ideal_ivs").select("rank,atk_iv,def_iv,hp_iv,level,cp").eq("form_id",fid).eq("league_id",lg).order("rank");
   if(e1){box.innerHTML=`<div class="empty">読み込みエラー：${esc(e1.message)}</div>`;return;}
+  // 手持ちは認証クライアント。失敗しても個体値表示は止めない
+  let owned=[]; try{owned=await loadOwned(fid,lg);}catch(_){owned=[];}
   const byRank={}; owned.forEach(o=>{(byRank[o.rank]=byRank[o.rank]||[]).push(o);});
   box.innerHTML=ideal.map(r=>{const haves=byRank[r.rank]||[];
     return `<div class="rk${haves.length?" owned":""}"><div class="rk-top">
