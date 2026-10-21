@@ -1,4 +1,9 @@
 <title>理想個体ノート</title>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
@@ -194,6 +199,7 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
+const VERSION="2026-10-21c";
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 // 公開参照データ(種族/フォーム/個体値)は supabase-js を介さず匿名キーで直接取得する。
 // → ログイン状態・認証トークン・GoTrueのロックに一切左右されず、常に読める。
@@ -240,7 +246,9 @@ async function boot(){
     sb.auth.getSession()
   ]);
   if(sp.error||fm.error){main.innerHTML=`<div class="empty"><b>読み込みエラー</b>${esc((sp.error||fm.error).message)}</div>`;return;}
-  speciesAll=sp.data; speciesAll.forEach(s=>speciesName[s.dex]=s.name_ja);
+  speciesAll=sp.data;
+  if(!speciesAll.length){main.innerHTML=`<div class="empty"><b>データ0件（${VERSION}）</b>接続は成功しましたが種族データが0件でした。お手数ですがこの画面を報告してください。</div>`;return;}
+  speciesAll.forEach(s=>speciesName[s.dex]=s.name_ja);
   fm.data.forEach(f=>{formCache[f.id]=f;(formsByDex[f.dex]=formsByDex[f.dex]||[]).push(f);});
   TYPES.forEach(t=>typeCount[t[0]]=0); RARITY.forEach(r=>rarityCount[r[0]]=0);
   speciesAll.forEach(s=>{const ts=new Set(),rs=new Set();(formsByDex[s.dex]||[]).forEach(f=>{if(f.type1)ts.add(f.type1);if(f.type2)ts.add(f.type2);if(f.rarity)rs.add(f.rarity);});ts.forEach(t=>{if(typeCount[t]!=null)typeCount[t]++;});rs.forEach(r=>{if(rarityCount[r]!=null)rarityCount[r]++;});});
@@ -445,7 +453,8 @@ function collCard(o){const f=formCache[o.form_id]||{};const fl=formLabel(f);
 function renderAccount(){
   if(session){
     main.innerHTML=`<div class="card"><h2>ログイン中</h2><div class="msg ok">${esc(session.user.email||"")}</div><button class="btn ghost" id="out">ログアウト</button></div>
-      <p class="note">手持ちデータはあなたのアカウントにのみ保存され、他の人からは見えません（RLSで保護）。</p>`;
+      <p class="note">手持ちデータはあなたのアカウントにのみ保存され、他の人からは見えません（RLSで保護）。</p>
+      <p class="note" style="text-align:center;opacity:.7">ver. ${VERSION}</p>`;
     document.getElementById("out").addEventListener("click",async()=>{
       // サーバー呼び出しが固まっても確実にログアウトするため scope:'local' ＋ ローカル手動クリア
       try{await sb.auth.signOut({scope:"local"});}catch(_){}
@@ -459,7 +468,8 @@ function renderAccount(){
     <div class="field"><label>パスワード</label><input id="pw" type="password" autocomplete="current-password" placeholder="6文字以上"></div>
     <div class="msg" id="amsg"></div>
     <div class="row2"><button class="btn" id="login" style="flex:1">ログイン</button><button class="btn ghost" id="signup" style="flex:1">新規登録</button></div></div>
-    <p class="note">理想個体の閲覧はログイン不要。手持ちの記録にだけアカウントが必要です。新規登録後に確認メールが届く場合があります。</p>`;
+    <p class="note">理想個体の閲覧はログイン不要。手持ちの記録にだけアカウントが必要です。新規登録後に確認メールが届く場合があります。</p>
+    <p class="note" style="text-align:center;opacity:.7">ver. ${VERSION}</p>`;
   const em=()=>document.getElementById("email").value.trim(),pw=()=>document.getElementById("pw").value;
   const msg=(t,c="")=>{const m=document.getElementById("amsg");m.className="msg "+c;m.textContent=t;};
   document.getElementById("login").addEventListener("click",async()=>{msg("処理中…");const {error}=await sb.auth.signInWithPassword({email:em(),password:pw()});if(error)msg("ログイン失敗："+error.message,"err");});
@@ -471,6 +481,6 @@ function toast(t){let el=document.getElementById("toast");
   if(!el){el=document.createElement("div");el.id="toast";el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;font-size:.9rem;z-index:60;box-shadow:var(--shadow-soft);opacity:0;transition:opacity .2s";document.body.appendChild(el);}
   el.textContent=t;requestAnimationFrame(()=>el.style.opacity="1");clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity="0",1800);}
 
-sb.auth.onAuthStateChange(async(_e,s)=>{const had=!!session;session=s;await loadOwnedDex();if(activeTab==="account")renderAccount();else if(activeTab==="collection")renderCollection();else if(!had&&activeTab==="search"&&searchView==="list")renderSearch();});
+sb.auth.onAuthStateChange(async(_e,s)=>{const had=!!session;session=s;await loadOwnedDex();if(activeTab==="account")renderAccount();else if(activeTab==="collection")renderCollection();else if(!had&&activeTab==="search"&&searchView==="list"&&speciesAll.length)renderSearch();});
 boot();
 </script>
