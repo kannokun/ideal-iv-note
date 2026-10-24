@@ -1,0 +1,30 @@
+name: Update Pokémon data (monthly)
+
+# 毎月1日 03:00 UTC（=12:00 JST）に自動実行。手動実行も可（Actionsタブ → Run workflow）。
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch: {}
+
+# 同時実行を防ぐ
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run updater
+        env:
+          SB_URL: https://jhzukqbdlhmxnvkehxhg.supabase.co
+          SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/update_data.py
