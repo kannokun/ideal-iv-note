@@ -199,8 +199,9 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
-const VERSION="2026-10-21c";
-const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+const VERSION="2026-10-24d";
+// lock: iOS Safari で getSession()/トークン更新が navigator.locks でハングするのを回避するno-opロック
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,lock:async(_n,_t,fn)=>await fn()}});
 // 公開参照データ(種族/フォーム/個体値)は supabase-js を介さず匿名キーで直接取得する。
 // → ログイン状態・認証トークン・GoTrueのロックに一切左右されず、常に読める。
 async function pubGet(pathAndQuery){
@@ -240,10 +241,10 @@ async function fetchAll(table,cols,order){
 }
 async function boot(){
   main.innerHTML=`<div class="loading">データを読み込み中…</div>`;
-  const [sp,fm,ss]=await Promise.all([
+  // 公開データの取得はセッション取得から完全に切り離す（getSessionがハングしても閲覧は止めない）
+  const [sp,fm]=await Promise.all([
     fetchAll("pokemon_species","dex,name_ja,family_id","dex"),
-    fetchAll("pokemon_forms","id,dex,region,form,species_en,type1,type2,rarity","id"),
-    sb.auth.getSession()
+    fetchAll("pokemon_forms","id,dex,region,form,species_en,type1,type2,rarity","id")
   ]);
   if(sp.error||fm.error){main.innerHTML=`<div class="empty"><b>読み込みエラー</b>${esc((sp.error||fm.error).message)}</div>`;return;}
   speciesAll=sp.data;
@@ -253,8 +254,23 @@ async function boot(){
   TYPES.forEach(t=>typeCount[t[0]]=0); RARITY.forEach(r=>rarityCount[r[0]]=0);
   speciesAll.forEach(s=>{const ts=new Set(),rs=new Set();(formsByDex[s.dex]||[]).forEach(f=>{if(f.type1)ts.add(f.type1);if(f.type2)ts.add(f.type2);if(f.rarity)rs.add(f.rarity);});ts.forEach(t=>{if(typeCount[t]!=null)typeCount[t]++;});rs.forEach(r=>{if(rarityCount[r]!=null)rarityCount[r]++;});});
   regionCount=REGIONS.map(([,lo,hi])=>speciesAll.filter(s=>s.dex>=lo&&s.dex<=hi).length);
-  session=ss.data.session; if(session)await loadOwnedDex();
-  switchTab("search");
+  switchTab("search");            // 公開データが揃った時点で即描画（認証を待たない）
+  initSession();                  // セッションは裏で取得（非同期・タイムアウト保護）
+}
+async function getSessionSafe(){
+  try{
+    const r=await Promise.race([
+      sb.auth.getSession(),
+      new Promise(res=>setTimeout(()=>res({data:{session:null}}),5000))
+    ]);
+    return (r&&r.data&&r.data.session)||null;
+  }catch(_){return null;}
+}
+async function initSession(){
+  session=await getSessionSafe();
+  if(session)await loadOwnedDex();
+  if(activeTab==="account")renderAccount();
+  else if(activeTab==="collection")renderCollection();
 }
 async function loadOwnedDex(){ownedDex=new Set();if(!session)return;try{const {data}=await sb.from("user_collection").select("form_id");(data||[]).forEach(r=>{const f=formCache[r.form_id];if(f)ownedDex.add(f.dex);});}catch(_){}}
 
