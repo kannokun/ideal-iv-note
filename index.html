@@ -106,6 +106,16 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 .sp-card .c-types{display:flex;gap:5px}
 .mini-t{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.74rem;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 1px 1px rgba(0,0,0,.12)}
 .count-note{text-align:center;color:var(--faint);font-size:.82rem;margin-top:12px;grid-column:1/-1}
+.sp-card.locked{filter:grayscale(.92);opacity:.42}
+.sp-card.got{box-shadow:inset 0 0 0 2px var(--good),var(--shadow-soft)}
+.stat.tap{cursor:pointer}
+.stat.tap:active{transform:scale(.99)}
+.stat .chev{margin-left:8px;color:var(--faint);font-weight:800;font-size:1.1rem;line-height:1}
+.have{cursor:pointer}
+.rdex-head{display:flex;align-items:center;gap:9px;margin:2px 2px 2px;font-size:1.05rem}
+.rdex-head .rico{font-size:1.4rem}
+.rdex-head b{font-family:var(--f-dot);font-synthesis:none}
+.rdex-head .rfrac{margin-left:auto;font-family:var(--f-num);font-weight:700;color:var(--muted)}
 
 /* apply bar */
 .applybar{position:fixed;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:35;display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-left,0px))}
@@ -213,7 +223,7 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
-const VERSION="2026-10-24i";
+const VERSION="2026-10-24j";
 // 認証も supabase-js を使わず REST を直接叩く（GoTrueのロックでiOS Safariが固まる問題を根絶）。
 let auth=loadAuth();                 // {access_token, refresh_token, user} | null
 function loadAuth(){try{return JSON.parse(localStorage.getItem("iv_auth")||"null");}catch(_){return null;}}
@@ -234,10 +244,19 @@ async function refreshAuth(){
 // user_collection(本人データ)はアクセストークンで直接fetch。401は自動リフレッシュして1回だけ再試行。
 async function dbUser(method,query,body){
   if(!auth)throw new Error("ログインが必要です");
-  const run=()=>fetch(`${SB_URL}/rest/v1/${query}`,{method,headers:{apikey:SB_KEY,Authorization:`Bearer ${auth.access_token}`,"Content-Type":"application/json",...(method==="POST"?{Prefer:"return=representation"}:{})},body:body?JSON.stringify(body):undefined});
+  const run=()=>fetch(`${SB_URL}/rest/v1/${query}`,{method,headers:{apikey:SB_KEY,Authorization:`Bearer ${auth.access_token}`,"Content-Type":"application/json",...(method==="POST"||method==="PATCH"?{Prefer:"return=representation"}:{})},body:body?JSON.stringify(body):undefined});
   let r=await run();
-  if(r.status===401&&await refreshAuth())r=await run();
+  if(r.status===401){ if(await refreshAuth())r=await run(); }
+  if(r.status===401)authLost();   // リフレッシュしても401＝セッション失効
   return r;
+}
+function authLost(){
+  if(!auth)return;
+  saveAuth(null); ownedDex=new Set();
+  toast("セッションが切れました。再ログインしてください");
+  if(activeTab==="collection")renderCollection();
+  else if(activeTab==="account")renderAccount();
+  else if(activeTab==="search"&&searchView==="list"&&speciesAll.length)renderSearch();
 }
 // 公開参照データ(種族/フォーム/個体値)は supabase-js を介さず匿名キーで直接取得する。
 // → ログイン状態・認証トークン・GoTrueのロックに一切左右されず、常に読める。
@@ -363,32 +382,31 @@ function filteredSpecies(){
   return arr;
 }
 function nameFs(n){const L=[...(n||"")].length;return (L<=4?1.04:L<=5?0.94:L<=6?0.82:L<=7?0.72:0.64)+"rem";}
+function speciesCardHTML(s,dim){
+  const fs=formsByDex[s.dex]||[]; const tset=[]; fs.forEach(f=>{[f.type1,f.type2].forEach(t=>{if(t&&!tset.includes(t))tset.push(t);});});
+  const t1=TYPEMAP[tset[0]],t2=TYPEMAP[tset[1]];
+  const c1=(t1||[])[2]||'#9298a3',c2=(t2||t1||[])[2]||c1;
+  const chips=tset.slice(0,2).map(t=>{const m=TYPEMAP[t];return m?`<span class="mini-t" style="background:${m[2]}">${m[3]}</span>`:"";}).join("");
+  const own=ownedDex.has(s.dex);
+  return `<button class="sp-card${own?" got":(dim?" locked":"")}" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
+    <div class="band" style="background:linear-gradient(135deg,${c1},${c2})"><span class="c-dex">No.${s.dex}</span><span class="ball"></span>${own?`<span class="c-own">所持</span>`:""}</div>
+    <div class="c-body"><span class="c-name" style="font-size:${nameFs(s.name_ja)}">${esc(s.name_ja)}</span><span class="c-types">${chips}</span></div>
+  </button>`;
+}
 function paintResults(){
   const list=document.getElementById("splist"); if(!list)return;
   const data=filteredSpecies();
   if(!data.length){list.innerHTML=`<div class="empty" style="grid-column:1/-1"><b>該当なし</b>条件を変えてみてください。</div>`;return;}
   // 全件表示（イベント委譲でカードが多くても軽量）
-  list.innerHTML=data.map(s=>{
-    const fs=formsByDex[s.dex]||[]; const tset=[]; fs.forEach(f=>{[f.type1,f.type2].forEach(t=>{if(t&&!tset.includes(t))tset.push(t);});});
-    const t1=TYPEMAP[tset[0]], t2=TYPEMAP[tset[1]];
-    const c1=(t1||[])[2]||'#9298a3', c2=(t2||t1||[])[2]||c1;
-    const chips=tset.slice(0,2).map(t=>{const m=TYPEMAP[t];return m?`<span class="mini-t" style="background:${m[2]}">${m[3]}</span>`:"";}).join("");
-    return `<button class="sp-card" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
-      <div class="band" style="background:linear-gradient(135deg,${c1},${c2})">
-        <span class="c-dex">No.${s.dex}</span><span class="ball"></span>
-        ${ownedDex.has(s.dex)?`<span class="c-own">所持</span>`:""}
-      </div>
-      <div class="c-body"><span class="c-name" style="font-size:${nameFs(s.name_ja)}">${esc(s.name_ja)}</span><span class="c-types">${chips}</span></div>
-    </button>`;
-  }).join("")+`<div class="count-note">全 ${data.length} 件</div>`;
+  list.innerHTML=data.map(s=>speciesCardHTML(s,false)).join("")+`<div class="count-note">全 ${data.length} 件</div>`;
   if(!list.dataset.bound){list.dataset.bound="1";list.addEventListener("click",e=>{const b=e.target.closest(".sp-card");if(b)openSpecies(+b.dataset.dex,b.dataset.name);});}
 }
 
 /* ---------- DETAIL ---------- */
 let detail={dex:null,name:"",forms:[],formId:null,league:1};
-function openSpecies(dex,name){
+function openSpecies(dex,name,back){
   const fs=(formsByDex[dex]||[]).slice().sort((a,b)=>{const ab=(!a.region&&!a.form)?0:1,bb=(!b.region&&!b.form)?0:1;return ab-bb||a.id-b.id;});
-  detail={dex,name,forms:fs,formId:fs[0]?.id??null,league:1};
+  detail={dex,name,forms:fs,formId:fs[0]?.id??null,league:1,back:back||(()=>switchTab("search"))};
   renderDetail();
 }
 function formLabel(f){return f.region||f.form||"通常";}
@@ -406,8 +424,9 @@ function renderDetail(){
     </div>
     ${fs.length>1?`<div class="chips" id="formchips" style="--theme:${c1}">${fs.map(f=>`<button class="chip" data-id="${f.id}" aria-pressed="${f.id===detail.formId}">${esc(formLabel(f))}</button>`).join("")}</div>`:`<div style="height:4px"></div>`}
     <div class="lg-tabs" id="lgtabs">${[1,2,3].map(l=>`<button class="lg-tab" data-lg="${l}" aria-pressed="${l===detail.league}">${LEAGUES[l].name}<span class="lg-cap">${LEAGUES[l].cap}</span></button>`).join("")}</div>
+    <p class="note">⚠️ リトレーン(浄化)は全IV+2されます。SL/ULで攻撃0が理想の枠は、浄化済みでは到達できません（野生・シャドウで狙ってください）。</p>
     <div class="ranks" id="ranks" style="--theme:${c1}"></div>`;
-  document.getElementById("back").addEventListener("click",()=>switchTab("search"));
+  document.getElementById("back").addEventListener("click",()=>(detail.back||(()=>switchTab("search")))());
   const fc=document.getElementById("formchips"); if(fc)fc.addEventListener("click",e=>{const b=e.target.closest(".chip");if(b){detail.formId=+b.dataset.id;renderDetail();}});
   document.getElementById("lgtabs").addEventListener("click",e=>{const b=e.target.closest(".lg-tab");if(b){detail.league=+b.dataset.lg;renderDetail();}});
   loadRanking();
@@ -421,7 +440,7 @@ async function loadRanking(){
   catch(e){box.innerHTML=`<div class="empty">読み込みエラー：${esc(e.message)}</div>`;return;}
   // 手持ちは認証クライアント。失敗しても個体値表示は止めない
   let owned=[]; try{owned=await loadOwned(fid,lg);}catch(_){owned=[];}
-  const byRank={}; owned.forEach(o=>{(byRank[o.rank]=byRank[o.rank]||[]).push(o);});
+  const byRank={},ownedById={}; owned.forEach(o=>{(byRank[o.rank]=byRank[o.rank]||[]).push(o);ownedById[o.id]=o;});
   box.innerHTML=ideal.map(r=>{const haves=byRank[r.rank]||[];
     return `<div class="rk${haves.length?" owned":""}"><div class="rk-top">
       <span class="rk-no num">${r.rank}</span><span class="iv num">${r.atk_iv}/${r.def_iv}/${r.hp_iv}</span>
@@ -429,45 +448,56 @@ async function loadRanking(){
       <button class="addbtn" data-rank="${r.rank}">＋登録</button>
     </div>${haves.length?`<div class="haves">${haves.map(haveChip).join("")}</div>`:""}</div>`;
   }).join("");
-  box.querySelectorAll(".addbtn").forEach(b=>b.addEventListener("click",()=>openRegister(+b.dataset.rank)));
-  box.querySelectorAll(".have .del").forEach(b=>b.addEventListener("click",()=>deleteHave(+b.dataset.id)));
+  box.querySelectorAll(".addbtn").forEach(b=>b.addEventListener("click",()=>openHaveSheet({rank:+b.dataset.rank,formId:fid,league:lg,after:loadRanking})));
+  box.querySelectorAll(".have").forEach(el=>el.addEventListener("click",e=>{if(e.target.closest(".del"))return;const o=ownedById[+el.dataset.id];if(o)openHaveSheet({existing:o,after:loadRanking});}));
+  box.querySelectorAll(".have .del").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();deleteHave(+b.dataset.id);}));
 }
-async function loadOwned(fid,lg){if(!auth)return[];try{const r=await dbUser("GET",`user_collection?select=id,rank,is_shadow,is_purified,is_shiny,is_lucky,size&form_id=eq.${fid}&league_id=eq.${lg}`);return r.ok?await r.json():[];}catch(_){return[];}}
+async function loadOwned(fid,lg){if(!auth)return[];try{const r=await dbUser("GET",`user_collection?select=id,form_id,league_id,rank,is_shadow,is_purified,is_shiny,is_lucky,size,memo&form_id=eq.${fid}&league_id=eq.${lg}`);return r.ok?await r.json():[];}catch(_){return[];}}
 function haveChip(o){const tags=[];
   if(o.is_shadow)tags.push(`<span class="tag t-sh">S</span>`); if(o.is_purified)tags.push(`<span class="tag t-pu">浄</span>`);
   if(o.size==="XXL")tags.push(`<span class="tag t-xl">XXL</span>`); if(o.size==="XXS")tags.push(`<span class="tag t-xs">XXS</span>`);
   if(o.is_shiny)tags.push(`<span class="tag t-shiny">色</span>`); if(o.is_lucky)tags.push(`<span class="tag t-lucky">キラ</span>`);
-  return `<span class="have">所持${tags.join("")}<button class="del" data-id="${o.id}" title="削除">×</button></span>`;}
+  return `<span class="have" data-id="${o.id}" title="タップで編集">所持${tags.join("")}<button class="del" data-id="${o.id}" title="削除">×</button></span>`;}
 
-/* ---------- REGISTER ---------- */
-function openRegister(rank){
-  if(!auth){toast("登録にはログインが必要です");switchTab("account");return;}
-  const f=formCache[detail.formId];
+/* ---------- REGISTER / EDIT ---------- */
+// ctx: {rank, formId, league, after}（新規） または {existing, after}（編集）
+function openHaveSheet(ctx){
+  if(!auth){toast("ログインが必要です");switchTab("account");return;}
+  const ex=ctx.existing||null;
+  const formId=ex?ex.form_id:ctx.formId, league=ex?ex.league_id:ctx.league, rank=ex?ex.rank:ctx.rank;
+  const f=formCache[formId]||{}; const nm=speciesName[f.dex]||("No."+f.dex);
+  const st0=ex?(ex.is_shadow?"shadow":ex.is_purified?"purified":"normal"):"normal";
+  const sz0=ex?(ex.size||"通常"):"通常";
+  const pr=v=>v?"true":"false";
   const scrim=document.createElement("div");scrim.className="scrim";
   scrim.innerHTML=`<div class="sheet" role="dialog" aria-modal="true">
-    <h3>${esc(detail.name)}${f&&formLabel(f)!=="通常"?"（"+esc(formLabel(f))+"）":""}・${LEAGUES[detail.league].name} 第${rank}位を登録</h3>
-    <div class="field"><label>状態</label><div class="seg" id="st"><button data-v="normal" aria-pressed="true">通常</button><button data-v="shadow" aria-pressed="false">シャドウ</button><button data-v="purified" aria-pressed="false">リトレーン</button></div></div>
-    <div class="field"><label>サイズ</label><div class="seg" id="sz"><button data-v="通常" aria-pressed="true">通常</button><button data-v="XXL" aria-pressed="false">XXL</button><button data-v="XXS" aria-pressed="false">XXS</button></div></div>
-    <div class="toggles"><label class="tgl">色違い<input type="checkbox" id="shiny"></label><label class="tgl">キラ<input type="checkbox" id="lucky"></label></div>
-    <div class="field"><label>メモ（任意）</label><input id="memo" placeholder="例：交換用 / 2体目"></div>
+    <h3>${esc(nm)}${formLabel(f)!=="通常"?"（"+esc(formLabel(f))+"）":""}・${LEAGUES[league].name} 第${rank}位を${ex?"編集":"登録"}</h3>
+    <div class="field"><label>状態</label><div class="seg" id="st"><button data-v="normal" aria-pressed="${pr(st0==="normal")}">通常</button><button data-v="shadow" aria-pressed="${pr(st0==="shadow")}">シャドウ</button><button data-v="purified" aria-pressed="${pr(st0==="purified")}">リトレーン</button></div></div>
+    <p class="note" style="margin:-4px 2px 0">※リトレーン(浄化)は全IV+2。SL/ULで攻撃0が理想の枠は狙えません。</p>
+    <div class="field"><label>サイズ</label><div class="seg" id="sz"><button data-v="通常" aria-pressed="${pr(sz0==="通常")}">通常</button><button data-v="XXL" aria-pressed="${pr(sz0==="XXL")}">XXL</button><button data-v="XXS" aria-pressed="${pr(sz0==="XXS")}">XXS</button></div></div>
+    <div class="toggles"><label class="tgl">色違い<input type="checkbox" id="shiny" ${ex&&ex.is_shiny?"checked":""}></label><label class="tgl">キラ<input type="checkbox" id="lucky" ${ex&&ex.is_lucky?"checked":""}></label></div>
+    <div class="field"><label>メモ（任意）</label><input id="memo" placeholder="例：交換用 / 2体目" value="${ex&&ex.memo?esc(ex.memo):""}"></div>
     <div class="msg" id="rmsg"></div>
-    <div class="row2"><button class="btn ghost" id="cancel" style="flex:1">やめる</button><button class="btn" id="save" style="flex:2">登録する</button></div></div>`;
+    <div class="row2">${ex?`<button class="btn ghost" id="del" style="flex:1;color:var(--danger)">削除</button>`:`<button class="btn ghost" id="cancel" style="flex:1">やめる</button>`}<button class="btn" id="save" style="flex:2">${ex?"保存する":"登録する"}</button></div></div>`;
   document.body.appendChild(scrim);
   scrim.addEventListener("click",e=>{if(e.target===scrim)scrim.remove();});
   scrim.querySelector("#st").addEventListener("click",seg);
   scrim.querySelector("#sz").addEventListener("click",seg);
-  scrim.querySelector("#cancel").addEventListener("click",()=>scrim.remove());
+  const cancel=scrim.querySelector("#cancel"); if(cancel)cancel.addEventListener("click",()=>scrim.remove());
+  const del=scrim.querySelector("#del"); if(del)del.addEventListener("click",async()=>{del.disabled=true;await deleteHave(ex.id);scrim.remove();if(ctx.after)ctx.after();});
   scrim.querySelector("#save").addEventListener("click",async()=>{
     const btn=scrim.querySelector("#save");btn.disabled=true;
     const status=scrim.querySelector("#st").querySelector('[aria-pressed="true"]').dataset.v;
-    const row={form_id:detail.formId,league_id:detail.league,rank,is_shadow:status==="shadow",is_purified:status==="purified",
+    const vals={is_shadow:status==="shadow",is_purified:status==="purified",
       is_shiny:scrim.querySelector("#shiny").checked,is_lucky:scrim.querySelector("#lucky").checked,
       size:scrim.querySelector("#sz").querySelector('[aria-pressed="true"]').dataset.v,memo:scrim.querySelector("#memo").value.trim()||null};
     try{
-      const r=await dbUser("POST","user_collection",row);
+      let r;
+      if(ex)r=await dbUser("PATCH",`user_collection?id=eq.${ex.id}`,vals);
+      else r=await dbUser("POST","user_collection",{form_id:formId,league_id:league,rank,...vals});
       if(!r.ok){const t=await r.text();throw new Error(`${r.status} ${t}`);}
-    }catch(e){scrim.querySelector("#rmsg").className="msg err";scrim.querySelector("#rmsg").textContent="登録できませんでした："+e.message;btn.disabled=false;return;}
-    ownedDex.add(detail.dex);scrim.remove();toast("登録しました");loadRanking();
+    }catch(e){scrim.querySelector("#rmsg").className="msg err";scrim.querySelector("#rmsg").textContent=(ex?"保存":"登録")+"できませんでした："+e.message;btn.disabled=false;return;}
+    if(f.dex)ownedDex.add(f.dex);scrim.remove();toast(ex?"保存しました":"登録しました");if(ctx.after)ctx.after();
   });
 }
 function seg(e){const b=e.target.closest("button");if(!b)return;[...b.parentElement.children].forEach(x=>x.setAttribute("aria-pressed",x===b));}
@@ -481,18 +511,32 @@ async function renderCollection(){
   try{const r=await dbUser("GET","user_collection?select=id,form_id,league_id,rank,is_shadow,is_purified,is_shiny,is_lucky,size,memo&order=created_at.desc");if(!r.ok)throw new Error(`${r.status} ${await r.text()}`);data=await r.json();}
   catch(e){main.innerHTML=`<div class="empty">読み込みエラー：${esc(e.message)}</div>`;return;}
   const owned=new Set(); data.forEach(d=>{const f=formCache[d.form_id];if(f)owned.add(f.dex);}); ownedDex=owned;
-  const stats=REGIONS.map(([name,lo,hi],i)=>({name,ico:REGIONS[i][3],total:regionCount[i],own:[...owned].filter(d=>d>=lo&&d<=hi).length})).filter(r=>r.total>0);
-  let html=`<div class="sec-label">地方コンプ状況（アプリ収録種のうち所持数）</div><div class="stats">`+
+  const stats=REGIONS.map(([name,lo,hi],i)=>({name,ri:i,ico:REGIONS[i][3],total:regionCount[i],own:[...owned].filter(d=>d>=lo&&d<=hi).length})).filter(r=>r.total>0);
+  let html=`<div class="sec-label">地方コンプ状況（タップで図鑑表示）</div><div class="stats">`+
     stats.map(r=>{const pct=r.total?Math.round(r.own/r.total*100):0;const done=r.own>=r.total&&r.total>0;
-      return `<div class="stat${done?" done":""}"><div class="stat-top"><span class="ico">${r.ico}</span><b>${r.name}</b>${done?`<span class="comp">コンプ！🎉</span>`:`<span class="frac">${r.own} / ${r.total}</span>`}</div><div class="bar"><span style="width:${pct}%"></span></div></div>`;
+      return `<div class="stat tap${done?" done":""}" data-ri="${r.ri}"><div class="stat-top"><span class="ico">${r.ico}</span><b>${r.name}</b>${done?`<span class="comp">コンプ！🎉</span>`:`<span class="frac">${r.own} / ${r.total}</span>`}<span class="chev">›</span></div><div class="bar"><span style="width:${pct}%"></span></div></div>`;
     }).join("")+`</div>`;
-  if(!data.length){html+=`<div class="empty"><b>まだ手持ちがありません</b>検索からポケモンを開き「＋登録」で追加しましょう。</div>`;main.innerHTML=html;return;}
-  const groups={}; data.forEach(d=>{const dx=(formCache[d.form_id]||{}).dex;(groups[dx]=groups[dx]||[]).push(d);});
-  html+=`<div class="sec-label">所持個体（${data.length}体）</div>`+Object.keys(groups).sort((a,b)=>a-b).map(dx=>`
+  if(!data.length){html+=`<div class="empty"><b>まだ手持ちがありません</b>検索からポケモンを開き「＋登録」で追加しましょう。</div>`;main.innerHTML=html;wireCollStats();return;}
+  const groups={},collById={}; data.forEach(d=>{collById[d.id]=d;const dx=(formCache[d.form_id]||{}).dex;(groups[dx]=groups[dx]||[]).push(d);});
+  html+=`<div class="sec-label">所持個体（${data.length}体・タップで編集）</div>`+Object.keys(groups).sort((a,b)=>a-b).map(dx=>`
     <div class="coll-group"><h3>${esc(speciesName[dx]||"No."+dx)}<span class="g-dex num">No.${dx}</span></h3>
       <div class="ranks">${groups[dx].map(collCard).join("")}</div></div>`).join("");
   main.innerHTML=html;
-  main.querySelectorAll(".have .del").forEach(b=>b.addEventListener("click",async()=>{try{await dbUser("DELETE",`user_collection?id=eq.${+b.dataset.id}`);}catch(_){}renderCollection();}));
+  wireCollStats();
+  main.querySelectorAll(".have").forEach(el=>el.addEventListener("click",e=>{if(e.target.closest(".del"))return;const o=collById[+el.dataset.id];if(o)openHaveSheet({existing:o,after:renderCollection});}));
+  main.querySelectorAll(".have .del").forEach(b=>b.addEventListener("click",async e=>{e.stopPropagation();try{await dbUser("DELETE",`user_collection?id=eq.${+b.dataset.id}`);}catch(_){}renderCollection();}));
+}
+function wireCollStats(){main.querySelectorAll(".stat.tap").forEach(el=>el.addEventListener("click",()=>renderRegionDex(+el.dataset.ri)));}
+function renderRegionDex(ri){
+  const [name,lo,hi,ico]=REGIONS[ri];
+  const list=speciesAll.filter(s=>s.dex>=lo&&s.dex<=hi);
+  const own=list.filter(s=>ownedDex.has(s.dex)).length;
+  main.innerHTML=`<button class="back" id="rback">‹ 手持ちへ</button>
+    <div class="rdex-head"><span class="rico">${ico}</span><b>${name}地方</b><span class="rfrac">${own} / ${list.length}</span></div>
+    <div class="sp-grid" id="rdex">${list.map(s=>speciesCardHTML(s,true)).join("")}</div>`;
+  document.getElementById("rback").addEventListener("click",renderCollection);
+  const g=document.getElementById("rdex");
+  g.addEventListener("click",e=>{const b=e.target.closest(".sp-card");if(b)openSpecies(+b.dataset.dex,b.dataset.name,()=>renderRegionDex(ri));});
 }
 function collCard(o){const f=formCache[o.form_id]||{};const fl=formLabel(f);
   return `<div class="rk"><div class="rk-top"><span class="rk-no num">${o.rank}</span>
@@ -538,5 +582,6 @@ function toast(t){let el=document.getElementById("toast");
   if(!el){el=document.createElement("div");el.id="toast";el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;font-size:.9rem;z-index:60;box-shadow:var(--shadow-soft);opacity:0;transition:opacity .2s";document.body.appendChild(el);}
   el.textContent=t;requestAnimationFrame(()=>el.style.opacity="1");clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity="0",1800);}
 
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
 boot();
 </script>
