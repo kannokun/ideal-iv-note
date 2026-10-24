@@ -102,7 +102,7 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
   background:radial-gradient(circle at 50% 50%,#fff 0 4px,transparent 5px),linear-gradient(to bottom,rgba(255,255,255,.5) 0 46%,#fff 46% 54%,rgba(255,255,255,.22) 54% 100%);
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.55)}
 .sp-card .c-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 5px 11px}
-.sp-card .c-name{font-weight:400;font-size:1.02rem;line-height:1.18;-webkit-text-stroke:.55px currentColor;text-stroke:.55px currentColor}
+.sp-card .c-name{font-weight:400;font-size:1.02rem;line-height:1.18;-webkit-text-stroke:.55px currentColor;text-stroke:.55px currentColor;white-space:nowrap;max-width:100%}
 .sp-card .c-types{display:flex;gap:5px}
 .mini-t{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.74rem;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 1px 1px rgba(0,0,0,.12)}
 .count-note{text-align:center;color:var(--faint);font-size:.82rem;margin-top:12px;grid-column:1/-1}
@@ -213,7 +213,7 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
-const VERSION="2026-10-24h";
+const VERSION="2026-10-24i";
 // 認証も supabase-js を使わず REST を直接叩く（GoTrueのロックでiOS Safariが固まる問題を根絶）。
 let auth=loadAuth();                 // {access_token, refresh_token, user} | null
 function loadAuth(){try{return JSON.parse(localStorage.getItem("iv_auth")||"null");}catch(_){return null;}}
@@ -362,6 +362,7 @@ function filteredSpecies(){
   if(searchState.type||searchState.rarity)arr=arr.filter(s=>(formsByDex[s.dex]||[]).some(f=>(!searchState.type||f.type1===searchState.type||f.type2===searchState.type)&&(!searchState.rarity||f.rarity===searchState.rarity)));
   return arr;
 }
+function nameFs(n){const L=[...(n||"")].length;return (L<=4?1.04:L<=5?0.94:L<=6?0.82:L<=7?0.72:0.64)+"rem";}
 function paintResults(){
   const list=document.getElementById("splist"); if(!list)return;
   const data=filteredSpecies();
@@ -377,7 +378,7 @@ function paintResults(){
         <span class="c-dex">No.${s.dex}</span><span class="ball"></span>
         ${ownedDex.has(s.dex)?`<span class="c-own">所持</span>`:""}
       </div>
-      <div class="c-body"><span class="c-name">${esc(s.name_ja)}</span><span class="c-types">${chips}</span></div>
+      <div class="c-body"><span class="c-name" style="font-size:${nameFs(s.name_ja)}">${esc(s.name_ja)}</span><span class="c-types">${chips}</span></div>
     </button>`;
   }).join("")+`<div class="count-note">全 ${data.length} 件</div>`;
   if(!list.dataset.bound){list.dataset.bound="1";list.addEventListener("click",e=>{const b=e.target.closest(".sp-card");if(b)openSpecies(+b.dataset.dex,b.dataset.name);});}
