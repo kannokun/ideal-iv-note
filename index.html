@@ -39,7 +39,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{font-size:20px}
+html{font-size:17px}
+:root{--pkred:#ee5a52}
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-main);font-size:1rem;line-height:1.55;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
@@ -49,10 +50,13 @@ input{font-family:inherit;font-size:1rem}
 .num{font-variant-numeric:tabular-nums}
 
 #app{min-height:100%;display:flex;flex-direction:column}
-header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
-.bar-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;display:flex;align-items:center;gap:10px}
-.brand{font-weight:800;font-size:1.1rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
-.brand .dot{width:13px;height:13px;border-radius:50%;background:linear-gradient(135deg,var(--sl),var(--ml));box-shadow:inset 0 0 0 2px var(--surface)}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+header.bar::after{content:"";display:block;height:3px;background:linear-gradient(90deg,var(--sl),var(--pkred) 38%,var(--ul) 66%,var(--ml))}
+.bar-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:11px;display:flex;align-items:center;gap:9px}
+.brand{font-weight:800;font-size:1.12rem;letter-spacing:.01em;display:flex;align-items:center;gap:9px}
+.brand .dot{width:19px;height:19px;flex:none;border-radius:50%;box-shadow:inset 0 0 0 1.5px #2a2a2a,0 1px 2px rgba(0,0,0,.2);
+  background:radial-gradient(circle at 50% 50%,#fff 0 2.6px,#2a2a2a 2.6px 3.8px,transparent 3.8px),
+  linear-gradient(to bottom,var(--pkred) 0 45%,#2a2a2a 45% 55%,#fff 55% 100%)}
 main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:16px;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));max-width:760px;width:100%;margin:0 auto}
 
 .search{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:12px 18px;box-shadow:var(--shadow-soft)}
@@ -71,11 +75,12 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 .inum{font-size:.72rem;font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
 
 /* search bar as filter entry */
-.searchbar{width:100%;display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:13px 18px;box-shadow:var(--shadow-soft);color:var(--faint)}
+.searchbar{width:100%;display:flex;gap:9px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:11px 16px;box-shadow:var(--shadow-soft);color:var(--faint)}
 .searchbar:active{transform:scale(.99)}
-.searchbar .sb-text{flex:1;text-align:left;font-size:1.05rem;color:var(--faint)}
+.searchbar svg{flex:none}
+.searchbar .sb-text{flex:1;min-width:0;text-align:left;font-size:.95rem;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .searchbar .sb-text.has{color:var(--fg);font-weight:700}
-.searchbar .sb-tune{font-size:1.15rem;color:var(--accent)}
+.searchbar .sb-tune{flex:none;font-size:1.1rem;color:var(--accent)}
 .clearbtn{background:var(--surface-2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.85rem}
 /* filter entry line */
 .filt-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
@@ -84,15 +89,19 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 .fchip .x{color:var(--faint);font-weight:800;font-size:1rem}
 
 /* species cards */
-.sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;margin-top:12px}
-.sp-card{position:relative;aspect-ratio:1/1;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px;color:inherit;overflow:hidden}
-.sp-card:active{transform:scale(.97)}
-.sp-card .c-strip{position:absolute;top:0;left:0;right:0;height:7px}
-.sp-card .c-dex{position:absolute;top:10px;left:10px;font-family:var(--f-num);font-size:.66rem;color:var(--faint)}
-.sp-card .c-own{position:absolute;top:9px;right:9px;font-size:.62rem;font-weight:800;color:#fff;background:var(--good);padding:2px 7px;border-radius:999px}
-.sp-card .c-name{font-weight:800;font-size:1rem;text-align:center;line-height:1.15}
-.sp-card .c-types{display:flex;gap:4px}
-.mini-t{width:13px;height:13px;border-radius:50%}
+.sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:9px;margin-top:14px}
+.sp-card{position:relative;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-soft);display:flex;flex-direction:column;color:inherit;overflow:hidden;text-align:center}
+.sp-card:active{transform:scale(.96)}
+.sp-card .band{position:relative;height:50px;padding:7px 9px;overflow:hidden}
+.sp-card .c-dex{position:relative;z-index:1;font-family:var(--f-num);font-weight:800;font-size:.72rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.sp-card .c-own{position:absolute;top:7px;right:7px;z-index:2;font-size:.58rem;font-weight:800;color:#2e9e6f;background:#fff;padding:2px 6px;border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.sp-card .ball{position:absolute;right:-10px;bottom:-14px;width:44px;height:44px;border-radius:50%;opacity:.5;
+  background:radial-gradient(circle at 50% 50%,#fff 0 4px,transparent 5px),linear-gradient(to bottom,rgba(255,255,255,.5) 0 46%,#fff 46% 54%,rgba(255,255,255,.22) 54% 100%);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.55)}
+.sp-card .c-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 5px 11px}
+.sp-card .c-name{font-weight:800;font-size:.92rem;line-height:1.12}
+.sp-card .c-types{display:flex;gap:5px}
+.mini-t{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.74rem;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 1px 1px rgba(0,0,0,.12)}
 .count-note{text-align:center;color:var(--faint);font-size:.82rem;margin-top:12px;grid-column:1/-1}
 
 /* apply bar */
@@ -104,8 +113,11 @@ main{flex:1;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:m
 /* detail */
 .back{background:var(--surface-2);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:9px 16px;font-weight:700;font-size:.92rem;display:inline-flex;gap:6px;align-items:center;margin-bottom:12px}
 .hero{border-radius:20px;padding:18px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow-soft)}
+.hero::after{content:"";position:absolute;right:-26px;top:-26px;width:120px;height:120px;border-radius:50%;border:13px solid rgba(255,255,255,.16);opacity:1;pointer-events:none}
+.hero::before{content:"";position:absolute;right:16px;top:30px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);box-shadow:0 0 0 5px rgba(255,255,255,.14);pointer-events:none}
+.hero>*{position:relative;z-index:1}
 .hero-dex{font-family:var(--f-num);font-size:.92rem;opacity:.9}
-.hero-name{font-size:1.75rem;margin:2px 0 10px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.28)}
+.hero-name{font-size:1.7rem;margin:2px 0 10px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.28)}
 .hero-types{display:flex;gap:6px}
 .tbadge{font-size:.82rem;font-weight:700;color:#fff;padding:4px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
 .hero .tbadge{background:rgba(255,255,255,.24)}
@@ -198,7 +210,7 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
-const VERSION="2026-10-24e";
+const VERSION="2026-10-24f";
 // 認証も supabase-js を使わず REST を直接叩く（GoTrueのロックでiOS Safariが固まる問題を根絶）。
 let auth=loadAuth();                 // {access_token, refresh_token, user} | null
 function loadAuth(){try{return JSON.parse(localStorage.getItem("iv_auth")||"null");}catch(_){return null;}}
@@ -295,7 +307,7 @@ function renderSearch(){ if(searchView==="filter")renderFilter(); else renderRes
 
 function renderResults(){
   const af=activeFilters();
-  const barTxt=searchState.q.trim()?esc(searchState.q):"名前・図鑑番号・タイプで絞り込む";
+  const barTxt=searchState.q.trim()?esc(searchState.q):"名前・図鑑番号で検索";
   main.innerHTML=`
     <button class="searchbar" id="openfilter">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
@@ -351,19 +363,21 @@ function paintResults(){
   const list=document.getElementById("splist"); if(!list)return;
   const data=filteredSpecies();
   if(!data.length){list.innerHTML=`<div class="empty" style="grid-column:1/-1"><b>該当なし</b>条件を変えてみてください。</div>`;return;}
-  const cap=data.slice(0,150);
-  list.innerHTML=cap.map(s=>{
+  // 全件表示（イベント委譲でカードが多くても軽量）
+  list.innerHTML=data.map(s=>{
     const fs=formsByDex[s.dex]||[]; const tset=[]; fs.forEach(f=>{[f.type1,f.type2].forEach(t=>{if(t&&!tset.includes(t))tset.push(t);});});
-    const c1=(TYPEMAP[tset[0]]||[])[2]||'var(--line)';
-    const mini=tset.slice(0,3).map(t=>`<span class="mini-t" style="background:${(TYPEMAP[t]||[])[2]||'#999'}"></span>`).join("");
+    const t1=TYPEMAP[tset[0]], t2=TYPEMAP[tset[1]];
+    const c1=(t1||[])[2]||'#9298a3', c2=(t2||t1||[])[2]||c1;
+    const chips=tset.slice(0,2).map(t=>{const m=TYPEMAP[t];return m?`<span class="mini-t" style="background:${m[2]}">${m[3]}</span>`:"";}).join("");
     return `<button class="sp-card" data-dex="${s.dex}" data-name="${esc(s.name_ja)}">
-      <span class="c-strip" style="background:${c1}"></span>
-      <span class="c-dex num">${s.dex}</span>
-      ${ownedDex.has(s.dex)?`<span class="c-own">所持</span>`:""}
-      <span class="c-name">${esc(s.name_ja)}</span>
-      <span class="c-types">${mini}</span></button>`;
-  }).join("")+(data.length>150?`<div class="count-note">他 ${data.length-150} 件。検索やフィルターで絞り込んでください。</div>`:"");
-  list.querySelectorAll(".sp-card").forEach(b=>b.addEventListener("click",()=>openSpecies(+b.dataset.dex,b.dataset.name)));
+      <div class="band" style="background:linear-gradient(135deg,${c1},${c2})">
+        <span class="c-dex">No.${s.dex}</span><span class="ball"></span>
+        ${ownedDex.has(s.dex)?`<span class="c-own">所持</span>`:""}
+      </div>
+      <div class="c-body"><span class="c-name">${esc(s.name_ja)}</span><span class="c-types">${chips}</span></div>
+    </button>`;
+  }).join("")+`<div class="count-note">全 ${data.length} 件</div>`;
+  if(!list.dataset.bound){list.dataset.bound="1";list.addEventListener("click",e=>{const b=e.target.closest(".sp-card");if(b)openSpecies(+b.dataset.dex,b.dataset.name);});}
 }
 
 /* ---------- DETAIL ---------- */
