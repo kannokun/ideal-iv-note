@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap">
 <style>
 /* Layout: モバイル1カラム + 下部タブ。GO風タイプアイコン、正方形カード、タイプ色ベースの詳細。 */
 :root{
@@ -18,7 +18,8 @@
   --shadow-soft:0 1px 2px rgba(20,28,48,.06),0 6px 18px rgba(20,28,48,.07);
   --radius:16px;
   --f-main:"M PLUS Rounded 1c",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
-  --f-num:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --f-dot:"DotGothic16","M PLUS Rounded 1c",system-ui,sans-serif;
+  --f-num:"DotGothic16",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12151d; --surface:#1b2030; --surface-2:#232a3d; --line:#2e3650;
@@ -43,6 +44,8 @@ html{font-size:17px}
 :root{--pkred:#ee5a52}
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-main);font-size:1rem;line-height:1.55;-webkit-text-size-adjust:100%}
+/* ドットフォント（DotGothic16）は“見せる文字”に限定。説明文は丸ゴシックのまま。擬似ボールドは無効化してドットを崩さない */
+.brand,.sec-label,.c-name,.hero-name,.lg-tab,.tbadge,.chip,.coll-group h3,.card h2,.count-note,.rk-no,.filt-btn,.iname{font-family:var(--f-dot);font-synthesis:none;letter-spacing:.02em}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
 h1,h2,h3{margin:0;text-wrap:balance;font-weight:800}
 button{font-family:inherit;cursor:pointer}
@@ -210,7 +213,7 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 const SB_URL="https://jhzukqbdlhmxnvkehxhg.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls";
-const VERSION="2026-10-24f";
+const VERSION="2026-10-24g";
 // 認証も supabase-js を使わず REST を直接叩く（GoTrueのロックでiOS Safariが固まる問題を根絶）。
 let auth=loadAuth();                 // {access_token, refresh_token, user} | null
 function loadAuth(){try{return JSON.parse(localStorage.getItem("iv_auth")||"null");}catch(_){return null;}}
