@@ -1,0 +1,20 @@
+name: Keep Supabase awake
+
+# 無料プランは約7日アクセスが無いと自動一時停止するため、毎日1回DBを軽く叩いて回避する。
+# anonキーは公開情報(アプリにも埋め込み済み)なのでSecret不要。
+on:
+  schedule:
+    - cron: "17 2 * * *"   # 毎日 02:17 UTC（= 11:17 JST）
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST
+        env:
+          ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoenVrcWJkbGhteG52a2VoeGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxOTkwNzAsImV4cCI6MjEwNzc3NTA3MH0.gGYv6XbwmJiI0SDN0nOnJgG4kryL_JB0RIO7DEEJOls"
+        run: |
+          curl -fsS "https://jhzukqbdlhmxnvkehxhg.supabase.co/rest/v1/leagues?select=id&limit=1" \
+            -H "apikey: ${ANON}" -H "Authorization: Bearer ${ANON}" \
+            -o /dev/null -w "ping OK (HTTP %{http_code})\n"
